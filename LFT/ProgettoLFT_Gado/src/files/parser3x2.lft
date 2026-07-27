@@ -1,0 +1,7 @@
+assign [ + ( 1 , 2 ) to x ]
+;
+print( x )
+;
+if ( == 5 5 ) print(x) end
+;
+read(x)

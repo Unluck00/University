@@ -1,0 +1,6 @@
+/* calcolare la velocita‘ */
+assign 300 to d; // distanza
+assign 10 to t; // tempo
+print(* d t)
+assign 300 to d /*distanza*//*da Torino a Lione*/
+assign 300 to d /*distanza
