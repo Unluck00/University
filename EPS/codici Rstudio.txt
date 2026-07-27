@@ -1,0 +1,278 @@
+> totAlg_A <- sum(dati$algoritmo == "alg_A")  
+// sum() --> operazione di somma
+// var <- valore --> associa un valore alla variabile con "<-"
+// dati$algoritmo --> prende dalla tabella nominata "dati" la colonna con scritto algoritmo
+// dati$algoritmo == "alg_A" --> dalla colonna algoritmo si cerca il valore "alg_A"
+
+
+> print(totAlg_A) // --> stampa a schermo il risultato contenuto nella variabile
+> view(file) // --> visualizza il file tabella
+
+
+> mean(dati$tempo[dati$algoritmo == "alg_A"])
+> sd(dati$tempo[dati$algoritmo == "alg_A"])
+// mean() --> calcola la media 
+// sd() --> calcola la deviazione standard
+// dati$tempo[dati$algoritmo == "alg_A"] --> si trova i valori contenuti nella colonna "tempo" e con le parentesi '[ ]' si metta la condizione speciale che indica in quale contesto dev'essere preso quel valore; in questo caso dalla colonna "tempo" si prendono tutti i valori che sono associati al valore "alg_A" contenuto nella colonna "algoritmi"
+
+
+> quantile(dati$tempo[dati$algoritmo == "alg_A"], 0.95)
+// quantile(valore, percentuale) --> calcola il n°-quantile del campione (utile quando si parla di percentuali) 
+// dati$tempo[dati$algoritmo == "alg_A"], 0.95 --> i valori contenuti nella colonna "tempo" e con la condizione "alg_A", viene calcolato il 95° percentile (cosi si sa che oltre quella soglia si hanno i 5° dei dati superiori (valori alti)) 
+
+
+> n <- length(dati$tempo[dati$algoritmo == "alg_A"])
+> media <- mean(dati$tempo[dati$algoritmo == "alg_A"])
+> err_stand <- sd(dati$tempo[dati$algoritmo == "alg_A"]) / sqrt(n)
+> t_critico <- qt(1 - alpha / 2, df = n - 1)
+> lim_inf <- media - t_critico * err_stand
+> lim_sup <- media + t_critico * err_stand
+OPPURE
+> t.test(dati$tempo[dati$algoritmo == "alg_A"], conf.level = 0.99)
+// parlando di un Intervallo di Confidenza (IC) si ha l'intervallo ([a,b]) e il livello di confidenza (1-alpha) 
+// quando si calcola un IC si deve avere: n (taglia del campione), media (media del campione), errore standard, t_critico/z_critivo
+// si sceglie il t_critico se n<30 oppure se non si sa la deviazione standard della popolazione (σ); per cui si ha una distrubizione t-student --> qt(1 - alpha / 2, df = n - 1)  
+// si sceglie il z_critico se n>30 e si sa la deviazione standard della popolazione (σ); per cui si ha una distrubizione normale --> qnorm(1 - alpha / 2)
+ 
+
+> str(file) // --> permette di esplorare e comprendere la struttura oggetto (come data.frame, vettore o lista
+
+
+> sum(table(dati$trazione[dati$trazione >= 30 & dati$materiale == "B"]))
+// senza table() si farebbe la somma dei singoli valori contenuti nella colonna "trazione", mentre 'con' si farebbe la somma delle righe che contengono quel valore
+// & permette di aggiungere una seconda condizione con 'AND' 
+
+> sum(is.na(dati)) 
+// somma tutte le osservazioni mancanti
+
+> etichette <- colnames(dati)
+> barplot(table(dati[,etichette[2]]), xlab = etichette[2]) 
+// con etichette si può assegnare il numero e i nomi delle varie colonne
+// dati[,etichette[2]] --> estrae la seconda colonna del data frame 'dati'; la virgola permette di distinguere le righe e colonne (dati[righe, ] oppure dati[, colonne]) 
+// con table() si calcola la frequenza di ciascun valore unico presente in quella colonna
+// con xlab = etichette[2] --> imposta l'etichetta dell'asse x come il nome corrispondente al secondo elemento del vettore "etichette"; rende il grafico più leggibile
+
+> boxplot(dati$trazione[dati$materiale == "A"], dati$trazione[dati$materiale == "B"], ylab = "trazione", names = c("materiale A", "materiale B"))
+// ylab = "trazione" --> imposta l'etichetta dell'asse y come "trazione"
+// names = c("materiale A", "materiale B") --> i nomi vengono assegnati ai vari gruppi creati tramite le boxplot
+
+
+// per calcolare l'assimetria nei valori di distribuzione, tramite skewness 
+calculate_skewness <- function(x) {
+     n <- length(x)
+     mean_x <- mean(x)
+     sd_x <- sd(x)
+     skewness <- sum((x - mean_x)^3) / (n * sd_x^3)
+     return(skewness)
+ }
+successivamente si usa la funzione skewness del tipo:
+> calculate_skewness(dati$tempo[dati$algoritmo == "alg_A"])
+
+
+> t.test(trazA, trazB, alternative = "less", mu = 0, paired = FALSE)
+// si usa per fare il test di ipotesi sulla differenza delle medie (dove trazA e trazB sono dei valori che si confrontano); se il p-value è minore di 0.01/0.05 allora si scarta l'ipotesi nulla e s favorisce l'ipotesi alternativa
+// ipotesi 0: trazA - trazB = 0 --> trazA = trazB // mu = 0 
+// ipotesi alternativa: trazA < trazB  (alternative = "less")
+// paired = FALSE --> i campioni non sono appaiati (campioni indipendenti) 
+// paired = TRUE --> i campioni sono appaiati
+In questo esercizio i campioni sono indipendenti, lo si nota dal fatto che i valori sono assegnati a due gruppi in cui sono differenti e non confrontabili tra loro. non c'è una corrispondenza diretta tra le osservazioni nei due gruppi (quello contenente i valori della compressione e quelli del gruppo A o B)
+I campioni appaiati sono più indicati se corre la dipendenza tra le osservazioni, cioè quando le osservazioni nei due gruppi sono correlate o dipendenti (coppia di osservazioni rappresenta la stessa unità o task)
+
+
+> binom.test(oss_succ, oss_tot, alternative = "greater", p = 0.60)
+// si parla di test di ipotesi sulla proporzione, dove oss_succ sono le osservazioni con "successo" e oss_tot sono le osservazioni totali della popolazione
+// p è la probabilità di successo
+
+
+> is.na(dati) // --> funzione che selezione tutti gli elementi NA (cioè senza valore)   
+> sum(is.na(dati)) // --> somma tutti i valori che hanno elemento NA
+> na.rm = TRUE // --> condizione che permette di non leggere gli elementi che hanno un valore NA al loro interno
+
+
+//se media e circa uguale alla mediana, allora l'istogramma è simmetrico
+
+
+
+// si parla di una v.a. distribuita come una Normale (in cui si ha la media m e la varianza v)
+> pnorm(1.5, m, dv) // --> calcolo della probabilità che la v.a. sia minore di 1.5
+> 1 - pnorm(3, m, dv) // -->  calcolo della probabilità che la v.a. sia maggiore di 3
+> pnorm(6, m, dv) - pnorm(3, m, dv) // --> calcolo della probabilità che la v.a. sia minore di 3 e maggiore di 6
+> ( pnorm(6,0,2) - pnorm(3,0,2) ) / pnorm(6,0,2) // --> calcolo probabilità che X sia maggiore di 3 sapendo che X è minore di 6 (probabilità condizionata)
+// pnorm( ) --> il primo parametro è il quantile, il secondo parametro è la media e il terzo è la deviazione standard (dv = sqrt(varianza)) 
+
+
+
+// si parla di due v.a. una distribuita come Normale (Px) (media m e varianza v) e l'altra come Normale Standard (media 0 e varianza 1); queste 2 v.a. sono indipendenti tra loro
+> ( 1 - pnorm(3, m, v) ) * ( 1 - pnorm(3, 0, 1) ) // calcola la probabilità che entrambe le variabili aleatorie siano maggiori di 3 --> Px * Py (calcolo la distribuzione congiunta delle 2 v.a. indipendenti)
+
+
+
+// La probabilità che X sia minore di 8.5 oppure maggiore di 12 sapendo che X è maggiore di 8. 
+// Usiamo la definizione di probabilità condizionata:
+P(A∩B) / P(B) + P(A∩B) / P(B)
+Evento1 <-( pnorm(8.5, 10, 4) - (pnorm(8, 10, 4)) ) / (1-pnorm(8, 10, 4))  
+Evento2 <- ( 1-pnorm(12, 10, 4) ) / (1-pnorm(8, 10, 4))
+Evento1 + Evento2
+
+
+
+// Sia X una variabile aleatoria distribuita come una Normale di parametri μ=3
+ e σ^2=1. Sia Y una variabile aleatoria distribuita come una Normale standard, indipendente da X.
+
+//1)  La probabilità che X sia minore di 2.5 oppure che Y sia maggiore di -1, sapendo che Y è maggiore di -2
+P(X < 2.5 u Y > -1 | Y > -2 )  -->  teorema della probabilità incondizionata
+P(X < 2.5 | Y > -2) + P(Y > -1 | Y > -2) - P(X < 2.5 ∩ Y > -1 | Y > -2)
+P(X < 2.5 ∩ Y > -1 | Y > -2)  -->  essendo le due v.a. indipendenti allora si ha che --> P(X < 2.5 | Y > -2) * P(Y > -1 | Y > -2) 
+//2)  La probabilità che X sia minore di 7 sapendo che (X+1) è maggiore di 6
+Essendo che X è una v.a. (cioè una funzione) allora quando si fa X+1 si sta facendo la traslazione a destra di uno, per cui la media trasla a destra di uno e si trasforma in μ=4
+(pnorm(7,3,1)-(pnorm(6,4,1))) / (1-(pnorm(6,4,1)))
+
+
+
+// Procedi con il seguente esperimento: lanci una moneta truccata che restituisce testa con probabilità 0.3. Se ottieni testa estrai con reimbussolamento 8 palline da un’urna che ne contiene 11, delle quali 4 sono bianche e 7 sono verdi. Se ottieni croce estrai, con reimbussolamento dalla stessa urna, 6 palline.
+
+  1  Con quale probabilità ottieni 3 palline verdi? Risposta
+dbinom(3, 8, (7/11))*0.3 + dbinom(3, 6, (7/11)) * 0.7  --> legge delle probabilità totali
+A = "3 palline verdi"
+T = "ottenere testa"
+T = "ottenere croce"
+P(A) = P(A|testa) * P(T) + P(A|croce) * P(C)
+
+  2  Con quale probabilità ottieni 7 palline verdi? Risposta
+
+  3  Con quale probabilità ottieni meno di (<) 3 palline verdi? Risposta
+( ( dbinom(1,8,7/11) + dbinom(2,8,7/11) + dbinom(0,8,7/11) )*0.3 +  ( dbinom(1,6,7/11) + dbinom(2,6,7/11) + dbinom(0,6,7/11) )*0.7 )
+
+  4  Con quale probabilità avevi ottenuto testa se hai estratto meno di (<) 3 palline verdi? Risposta
+( ( dbinom(1,8,7/11) + dbinom(2,8,7/11) + dbinom(0,8,7/11) )*0.3 ) / ( ( dbinom(1,8,7/11) + dbinom(2,8,7/11) + dbinom(0,8,7/11) )*0.3 +  ( dbinom(1,6,7/11) + dbinom(2,6,7/11) + dbinom(0,6,7/11) )*0.7 )  -->  teorema di bayes (aggiorna l'esercizio 3 con dati aggiuntivi)
+A --> "ottenere testa"
+B --> "estrazione di meno (<) 3 palline verdi" --> esercizio 3
+P(A|B) = P(A∩B) / P(B)
+
+
+
+// Un'urna contiene 5 palline bianche, 6 nere e 4 rosse. Si estraggono 2 palline.
+1 Si calcoli la probabilità che le due palline estratte siano dello stesso colore con estrazione in blocco. Risposta
+(choose(5,2) + choose(6,2) + choose(4,2)) / (choose(15,2)) 
+--> choose(n,m); Combinatoria -> combinazione semplice con probabilità uniforme discreta (casi favorevoli / casi possibili) 
+
+
+
+// Sia X una variabile aleatoria distribuita come una Normale di media 0.2 e varianza 1. Sia Y una variabile aleatoria distribuita come una Esponenziale di parametro ('rate') pari a 1, indipendente da X
+NB: possono essere utili le funzioni di R pexp e pnorm
+
+2. La probabilità che almeno una delle due variabili aleatorie sia maggiore di 2. Risposta
+> A <- 1-pnorm(2, 0.2, 1)
+> B <- 1-pexp(2)
+> A + B - (A*B)
+--> Unione --> P(AuB) = P(A) + P(B) - P(A∩B) --> Indipendenza di v.a. discrete (distribuzione congiunta)
+oppure 
+1 - (pnorm(2, 0.2, 1) * pexp(2))
+
+3. La probabilità che al massimo una delle due sia maggiore di 1. Risposta
+> A <- 1-pnorm(1, 0.2, 1)
+> B <- 1-pexp(1)
+> ¬A <- pnorm(1, 0.2, 1)
+> ¬B <- pexp(1)
+> A + B - (A*B)
+--> Unione --> P(¬(AuB)) = P(¬A) + P(¬B) - P(¬(A∩B)) --> Indipendenza di v.a. discrete (distribuzione congiunta) --> "al massimo" si intende non tutti e due (o uno o l'altro o nessuno dei due)
+oppure
+--> 1 - (P(X > 1) x P(Y > 1)) --> 1 - ((1-pnorm(1, 0.2, 1)) * (1-pexp(1)))
+
+
+P(AuBuC) --> P(A) + P(B) + P(C) - P(A∩B) - P(A∩C) - P(B∩C) + P(A∩B∩C)
+
+
+// Sia Y una variabile aleatoria distribuita come una Normale di media −5 e varianza 1. Consideriamo X=Y+4.
+Determinare:
+3 La probabilità che X sia positiva sapendo che 2X è minore di 3.
+Per calcolare la probabilità della v.a. 2X si trasforma il limite nella scala di X (3/2) e si lascia la media e varianza di X
+( pnorm(3/2,-1,1) - pnorm(0,-1,1) ) / pnorm(3/2,-1,1)  --> probabilità condizionata 
+
+
+// Si tira cinque volte una moneta non truccata. Calcolare: (p=1/2)
+1. la probabilità dell'evento A="i primi tre risultati sono uguali"; Risposta
+2 * (p * p * p)  --> il 2 riguarda sia Testa(T) e Croce(C) e poi si va di probabilità per i primi 3 lanci
+
+2. la probabilità dell'evento B="i primi tre o gli ultimi tre risultati sono uguali"; Risposta
+(2 * (p * p * p)) + (2 * (p * p * p)) - ( (2 * (p * p * p * p * p)) ) --> P(B) = P (A ∪ A') = P (A) + P (A') − P(A ∩ A')
+
+3. P(A|B) = P(A ∩ B)/P(B) = P(A)/P(B)
+
+
+// Una moneta sbilanciata viene lanciata ripetutamente. In ciascun lancio la probabilità che esca T è 0.4. Calcolare la probabilità degli eventi:
+1. A="la prima T esce al quarto lancio"; Risposta
+P (A) = P (CCCT) = 0.4 x (0.6)^3 = 0.0864
+
+2. B="la terza T esce al settimo lancio"; Risposta
+dbinom(2,6,p) * p
+choose(6,2) x (0.4)^3 x (0.6)^4
+
+3. C=A∩B
+P (C) = P (A ∩ B) = P ( (CCCTCTT) oppure (CCCTTCT) ) = (2) x (0.4)^3 x (0.6)^4
+
+
+// Ci sono quattro scatole in un armadio: la scatola A ha 4 palline numerate da 1 a 4, la scatola B ha sei palline numerate da 1 a 6), le scatole C e D  hanno ambedue 8 palline numerate da 1 a 8. La tua amica prende segretamente e uniformemente a caso una scatola e ne estrae una pallina.
+1 - Determinare la probabilità di ottenere un numero minore o uguale a 3 (≤3) oppure 5 Risposta
+(1/4) * (3/4) + ((1/4) * ((3/6) + (1/6))) + ((1/2)*((3/8) + (1/8)))
+--> prima si sceglie una delle 4 scatole tra A, B, C e D (1/4) e poi si calcola la probabilità che ci siano i numeri
+(1/4) * (3/4) --> scatola A 
+((1/4) * ((3/6) + (1/6))) --> scatola B
+((1/2) * ((3/8) + (1/8))) --> scatola C e D
+
+2 - Sai che è uscito 4 oppure 5. Qual è la probabilità che la pallina sia stata estratta dalla scatola C o dalla D? Risposta 
+P(A) --> probabilità che la pallina sia stata estratta dalla scatola C o dalla D
+P(B) --> probabilità che la pallina sia stata estratta dalle scatole A, B, C e D
+P(A|B) = P(A ∩ B)/P(B)  --> Probabilità condizionata 
+(((1/2) * ((1/8) + (1/8)))) / ( (1/4) * (1/4) + ((1/4) * ((1/6) + (1/6))) + ((1/2) * ((1/8) + (1/8))) )
+
+
+
+// L'urna U1 contiene una proporzione 0.3 di palline bianche e l'urna U2 una proporzione 0.5 di palline bianche. Si estraggono con reimbussolamento 4 palline da U1 e 6 da U2. Tutte le palline estratte vengono sistemate in una terza urna U3. Sia X la proporzione di palline bianche nell'urna U3. 
+
+1. il valore atteso EX
+Per calcolare il valore atteso nell'urna U3, bisogna prima calcolare il valore atteso dell'urna U1 e U2. 
+N.B. il calcolo del valore atteso per la distribuzione binomiale è EX = n*p con n che è il numero di estrazioni delle palline dall'urna e p è la proporzione di estrarre la pallina bianca
+E(U1) = 4 * 0.3 
+E(U2) = 6 * 0.5
+Successivamente si calcola la proporzione (del valore atteso) delle palline bianche nell'urna U3 con il valore atteso lineare (vale sia per variabili dipendenti che indipendenti) --> E[X+Y]=E[X]+E[Y]
+E(U3) = E( (U1 + U2) / 10 ) = ( E(U1) + E(U2) ) / 10 --> Si sommano i valori attesi delle due urne (E(U1) e E(U2)) e li si divide per il totale delle palline contenute nell'urna U3 
+
+2. la varianza Var(X)
+La varianza per U3 si calcola con la varianza di U1 e U2 
+N.B. il calcolo della varianza per la distribuzione binomiale è VarX = n*p*(1-p) 
+Var(U1) = 4 * 0.3 * (1-0.3) 
+Var(U2) = 6 * 0.5 * (1-0.5)
+Calcolo dalla Var(U3) tramite la somma di variabili indipendenti --> Var(U1 + U2) = Var(U1) + Var(U2)
+Var(U3) = Var( ((U1) + (U2)) / 10 ) = (Var(U1) + Var(U2)) / (10)^2 
+inoltre Var( ((U1) + (U2)) / 10 ) si può ottenere una varianza lineare per le costanti (pensando a U1+U2 come una v.a. U1+U2=Y) --> Var(aY+b) = (a)^2 * Var(Y) dove a = 1/10 e b = 1
+
+3. il momento secondo EX^2
+si calcola modificando la seguente quantità della varianza --> Var(U3) = E((U3)^2) - (EU3)^2
+
+
+
+// Siano date 3 urne e 4 palline indistinguibili. Si definisca l'evento Aj = "l'urna j-esima resta vuota", con j = 1, 2, 3. Calcolare con quale probabilità, inserendo uniformemente a caso e indipendentemente le 4 palline nelle 3 urne
+1. la prima urna resti vuota; Risposta
+2. la seconda urna resti vuota; Risposta 
+(2/3)^4  --> probabilità che un'urna rimanga vuota (uniformemente vale per tutte le 3 urne, sia per il punto 1 e per il punto 2)
+
+3. almeno un'urna resta vuota; Risposta
+(1° caso) 
+con "almeno" si intende l'uso della probabilità "unione", quindi l'evento si può dire P(A1∪A2∪A3)
+P(A1)+P(A1)+P(A1)-P(A1∩A2)-P(A2∩A3)-P(A1∩A3)+P(A1∩A2∩A3) = 3 x (2/3)^4 - 3 x (1/3)^4 + 0
+3 x (2/3)^4 --> stessa probabilità per tutte e 3 le urne
+3 x (1/3)^4 --> stessa probabilità per tutte e 3 le urne che si ha un'intersezione (considerata vuota) con una seconda urna
+0 --> non esiste la possibilità che tutte e 3 le urne siano vuote
+oppure; 
+(2° caso) si può pensare che se prima calcoliamo la probabilità che un urna resti vuota per 3 volte (3 * (2/3)^4), allora c'è la probabilità che nello stesso momento (della prima urna) una seconda urna sia vuota quindi si fa la sottrazione con questa probabilità --> 3 * ((2/3)^4) - 3 * ((1/3)^4)
+
+4. due urne restano vuote se almeno una delle tre urne è vuota
+si usa la probabilità condizionata P(A∩B) / P(B), in cui sapendo che l'evento verificato P(A) -> "due urne restano vuote" e l'evento P(B) -> "almeno una delle tre urne è vuota" è lo stesso evento del punto 3;
+( 3 * ((1/3)^4) ) / ( 3 * ((2/3)^4) - 3 * ((1/3)^4) )
+
+
+
+
+
+ESERCIZI IMPORTANTI DA RICORDARE: 42, 44, 47/49/51, 52, 58, 59, 60, 62, 66, 82, 85
