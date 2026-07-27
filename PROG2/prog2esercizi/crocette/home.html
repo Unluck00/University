@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz di Java</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+        
+        body::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(255, 255, 255, 0.1) 0%, transparent 40%),
+                radial-gradient(circle at 80% 70%, rgba(255, 255, 255, 0.1) 0%, transparent 40%);
+            z-index: -1;
+        }
+        
+        .container {
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 50px;
+            padding: 20px;
+            animation: fadeIn 1s ease-out;
+        }
+        
+        .logo {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            color: #4CAF50;
+            text-shadow: 0 0 15px rgba(76, 175, 80, 0.5);
+        }
+        
+        h1 {
+            font-size: 3.5rem;
+            margin-bottom: 15px;
+            text-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            background: linear-gradient(45deg, #fff, #64B5F6);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .subtitle {
+            font-size: 1.5rem;
+            max-width: 700px;
+            margin: 0 auto 30px;
+            color: rgba(255, 255, 255, 0.85);
+        }
+        
+        .quiz-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin-top: 30px;
+        }
+        
+        .quiz-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            transition: all 0.4s ease;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            animation: cardAppear 0.8s ease-out;
+        }
+        
+        .quiz-card:nth-child(1) { animation-delay: 0.2s; }
+        .quiz-card:nth-child(2) { animation-delay: 0.4s; }
+        
+        .quiz-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+        }
+        
+        .quiz-card.exception::before {
+            background: linear-gradient(90deg, #FF5722, #E91E63);
+        }
+        
+        .quiz-card.binding::before {
+            background: linear-gradient(90deg, #2196F3, #3F51B5);
+        }
+        
+        .quiz-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+            background: rgba(255, 255, 255, 0.15);
+        }
+        
+        .quiz-icon {
+            font-size: 4.5rem;
+            margin: 20px 0;
+            transition: transform 0.3s ease;
+        }
+        
+        .quiz-card:hover .quiz-icon {
+            transform: scale(1.1);
+        }
+        
+        .quiz-card.exception .quiz-icon {
+            color: #FF5722;
+            text-shadow: 0 0 20px rgba(255, 87, 34, 0.5);
+        }
+        
+        .quiz-card.binding .quiz-icon {
+            color: #2196F3;
+            text-shadow: 0 0 20px rgba(33, 150, 243, 0.5);
+        }
+        
+        .quiz-title {
+            font-size: 2rem;
+            margin-bottom: 15px;
+            color: white;
+        }
+        
+        .quiz-description {
+            font-size: 1.1rem;
+            margin-bottom: 25px;
+            color: rgba(255, 255, 255, 0.8);
+            line-height: 1.6;
+        }
+        
+        .quiz-stats {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        
+        .stat {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+        
+        .start-btn {
+            display: inline-block;
+            padding: 14px 35px;
+            background: rgba(255, 255, 255, 0.15);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50px;
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .start-btn::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: 0.5s;
+        }
+        
+        .start-btn:hover::before {
+            left: 100%;
+        }
+        
+        .quiz-card.exception .start-btn:hover {
+            background: linear-gradient(90deg, #FF5722, #E91E63);
+            border-color: transparent;
+            box-shadow: 0 0 20px rgba(255, 87, 34, 0.5);
+        }
+        
+        .quiz-card.binding .start-btn:hover {
+            background: linear-gradient(90deg, #2196F3, #3F51B5);
+            border-color: transparent;
+            box-shadow: 0 0 20px rgba(33, 150, 243, 0.5);
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 50px;
+            padding: 20px;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 1rem;
+        }
+        
+        .java-icon {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            background: #E44D26;
+            border-radius: 50%;
+            line-height: 40px;
+            font-weight: bold;
+            margin: 0 10px;
+            transform: rotate(-15deg);
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes cardAppear {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.5rem;
+            }
+            
+            .subtitle {
+                font-size: 1.2rem;
+            }
+            
+            .quiz-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .quiz-title {
+                font-size: 1.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <i class="fab fa-java"></i>
+            </div>
+            <h1>Quiz di Java</h1>
+            <p class="subtitle">Metti alla prova le tue conoscenze di Java con i nostri quiz interattivi. Scegli un argomento e inizia a sfidarti!</p>
+        </header>
+        
+        <div class="quiz-grid">
+            <div class="quiz-card exception" onclick="window.location.href='eccezioni.html'">
+                <div class="quiz-icon">
+                    <i class="fas fa-bug"></i>
+                </div>
+                <h2 class="quiz-title">Gestione delle Eccezioni</h2>
+                <p class="quiz-description">30 domande su try-catch, finally e gestione degli errori. Metti alla prova la tua capacità di gestire situazioni impreviste nel codice.</p>
+                
+                <div class="quiz-stats">
+                    <div class="stat">
+                        <i class="fas fa-question-circle"></i> 30 Domande
+                    </div>
+                    <div class="stat">
+                        <i class="fas fa-clock"></i> 15-20 min
+                    </div>
+                </div>
+                
+                <a href="eccezioni.html" class="start-btn">Inizia il Quiz</a>
+            </div>
+            
+            <div class="quiz-card binding" onclick="window.location.href='binding.html'">
+                <div class="quiz-icon">
+                    <i class="fas fa-project-diagram"></i>
+                </div>
+                <h2 class="quiz-title">Binding e Polimorfismo</h2>
+                <p class="quiz-description">30 domande su binding dinamico, ereditarietà e polimorfismo. Verifica la tua comprensione dei concetti fondamentali della programmazione orientata agli oggetti.</p>
+                
+                <div class="quiz-stats">
+                    <div class="stat">
+                        <i class="fas fa-question-circle"></i> 30 Domande
+                    </div>
+                    <div class="stat">
+                        <i class="fas fa-clock"></i> 15-20 min
+                    </div>
+                </div>
+                
+                <a href="binding.html" class="start-btn">Inizia il Quiz</a>
+            </div>
+        </div>
+        
+        <footer>
+            <p>Realizzato con <span class="java-icon">J</span> &hearts; per tutti gli sviluppatori Java</p>
+        </footer>
+    </div>
+
+    <script>
+        // Effetto hover più fluido per le card
+        document.querySelectorAll('.quiz-card').forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-10px)';
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0)';
+            });
+        });
+        
+        // Effetto parallax per lo sfondo
+        document.addEventListener('mousemove', function(e) {
+            const x = e.clientX / window.innerWidth;
+            const y = e.clientY / window.innerHeight;
+            
+            document.body.style.backgroundPosition = `${x * 50}px ${y * 50}px`;
+        });
+    </script>
+</body>
+</html>

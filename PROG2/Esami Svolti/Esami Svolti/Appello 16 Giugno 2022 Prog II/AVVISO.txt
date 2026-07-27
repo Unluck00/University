@@ -1,0 +1,10 @@
+Il codice per eseguirlo deve avere la classe pubblica con il nome uguale al file,
+quindi, per gli Ex.java va resa pubblica la classe Ex e per le Soluzioni.java va rinominato il file in Ex.java e resa pubblica,
+oppure, la classe Ex rinominata in Soluzione e resa pubblica.
+
+
+Il codice è stato tutto formattato in modo che sia leggibile a differenza di cio' che viene dato solitamente dai docenti.
+Se la traccia va fuori schermo trovate lo shortcut per il word wrap (se su VSCode o simili) in modo che vada a capo da solo.
+
+
+Buono studio!

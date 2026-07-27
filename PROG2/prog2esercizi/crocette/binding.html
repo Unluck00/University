@@ -1,0 +1,1479 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Java: Binding e Polimorfismo</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background-color: rgba(255, 255, 255, 0.97);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+            padding: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .container::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 10px;
+            background: linear-gradient(90deg, #1a2a6c, #b21f1f, #1a2a6c);
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #eaeaea;
+        }
+        
+        h1 {
+            color: #1a2a6c;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .subtitle {
+            color: #b21f1f;
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+        }
+        
+        .instructions {
+            background-color: #e9f7fe;
+            border-left: 5px solid #1a2a6c;
+            padding: 15px;
+            margin-bottom: 30px;
+            border-radius: 0 8px 8px 0;
+            font-size: 1.05rem;
+        }
+        
+        .quiz-stats {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            padding: 10px;
+            background-color: #f0f8ff;
+            border-radius: 8px;
+            font-weight: bold;
+        }
+        
+        .question {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+        }
+        
+        .question:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+            border-left: 5px solid #1a2a6c;
+        }
+        
+        .question-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+        
+        .question-number {
+            font-weight: bold;
+            color: #1a2a6c;
+            font-size: 1.3rem;
+            background-color: #e3f2fd;
+            padding: 5px 12px;
+            border-radius: 20px;
+        }
+        
+        .question-text {
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+            line-height: 1.8;
+        }
+        
+        .code-block {
+            background-color: #2d2d2d;
+            color: #f8f8f2;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            overflow-x: auto;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+            white-space: pre;
+            counter-reset: line;
+            position: relative;
+        }
+        
+        .code-block div {
+            padding-left: 3em;
+            position: relative;
+        }
+        
+        .code-block div::before {
+            counter-increment: line;
+            content: counter(line);
+            position: absolute;
+            left: 0;
+            width: 2.5em;
+            text-align: right;
+            padding-right: 0.8em;
+            color: #6c6c6c;
+            border-right: 1px solid #444;
+        }
+        
+        .options {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+            margin-top: 20px;
+        }
+        
+        .option {
+            padding: 14px 18px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            font-size: 1.05rem;
+        }
+        
+        .option:hover {
+            background-color: #f5f9ff;
+            border-color: #aac;
+        }
+        
+        .option.selected {
+            background-color: #e3f2fd;
+            border-color: #1a2a6c;
+            font-weight: bold;
+            transform: scale(1.02);
+        }
+        
+        .option input {
+            margin-right: 12px;
+            cursor: pointer;
+            transform: scale(1.3);
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+        
+        button {
+            padding: 15px 35px;
+            font-size: 1.1rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        #check-btn {
+            background: linear-gradient(to right, #1a2a6c, #b21f1f);
+            color: white;
+        }
+        
+        #reset-btn {
+            background: linear-gradient(to right, #555, #333);
+            color: white;
+        }
+        
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        button:active {
+            transform: translateY(1px);
+        }
+        
+        .results {
+            margin-top: 40px;
+            padding: 30px;
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            display: none;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .results h2 {
+            text-align: center;
+            color: #1a2a6c;
+            margin-bottom: 25px;
+            font-size: 2rem;
+        }
+        
+        .score-display {
+            text-align: center;
+            font-size: 2rem;
+            margin-bottom: 30px;
+            font-weight: bold;
+            color: #1a2a6c;
+            padding: 15px;
+            border-radius: 10px;
+            background: linear-gradient(to right, #e3f2fd, #f0f8ff);
+        }
+        
+        .result-item {
+            padding: 18px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 15px;
+            border-radius: 8px;
+        }
+        
+        .result-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+        
+        .correct {
+            background-color: #e8f5e9;
+            border-left: 5px solid #4caf50;
+        }
+        
+        .incorrect {
+            background-color: #ffebee;
+            border-left: 5px solid #f44336;
+        }
+        
+        .result-status {
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            min-width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            margin-right: 15px;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+        
+        .correct .result-status {
+            background-color: #4caf50;
+            color: white;
+        }
+        
+        .incorrect .result-status {
+            background-color: #f44336;
+            color: white;
+        }
+        
+        .result-details {
+            flex-grow: 1;
+        }
+        
+        .result-question {
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #1a2a6c;
+        }
+        
+        .result-answer {
+            color: #555;
+            line-height: 1.6;
+        }
+        
+        .result-answer strong {
+            color: #333;
+        }
+        
+        .progress-container {
+            height: 12px;
+            background-color: #e0e0e0;
+            border-radius: 6px;
+            margin: 30px 0;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(to right, #b21f1f, #1a2a6c);
+            border-radius: 6px;
+            transition: width 0.5s ease;
+        }
+        
+        .highlight {
+            animation: highlight 1.5s ease;
+        }
+        
+        @keyframes highlight {
+            0% { background-color: rgba(255, 255, 0, 0.3); }
+            100% { background-color: transparent; }
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+            
+            .controls {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            button {
+                width: 100%;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .code-block div {
+                padding-left: 2.5em;
+                font-size: 0.85rem;
+            }
+            
+            .code-block div::before {
+                width: 2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Quiz Java: Binding e Polimorfismo</h1>
+            <p class="subtitle">30 domande su binding dinamico, ereditarietà e polimorfismo</p>
+        </header>
+        
+        <div class="instructions">
+            <p><strong>Istruzioni:</strong> Per ogni domanda, seleziona la risposta che ritieni corretta. Al termine del test, clicca sul pulsante "Correggi Test" per vedere i tuoi risultati. Puoi modificare le tue risposte in qualsiasi momento prima di correggere il test.</p>
+        </div>
+        
+        <div class="quiz-stats">
+            <div>Domande: <span id="total-questions">0</span>/30</div>
+            <div>Risposte: <span id="answered-questions">0</span></div>
+        </div>
+        
+        <div id="quiz-container">
+            <!-- Le domande verranno generate dinamicamente con JavaScript -->
+        </div>
+        
+        <div class="controls">
+            <button id="check-btn">Correggi Test</button>
+            <button id="reset-btn">Ricomincia Test</button>
+        </div>
+        
+        <div class="progress-container">
+            <div id="progress-bar" class="progress-bar" style="width: 0%"></div>
+        </div>
+        
+        <div id="results" class="results">
+            <h2>Risultati del Test</h2>
+            <div id="score" class="score-display"></div>
+            <div id="results-details"></div>
+        </div>
+    </div>
+
+    <script>
+        // Array di domande e risposte focalizzate su binding, polimorfismo e ereditarietà
+        const questions = [
+            {
+                question: "Cosa succede eseguendo questo codice?",
+                code: `abstract class A {
+    public abstract void m1();
+}
+
+class B extends A {
+    public void m1() {
+        System.out.println("B.m1");
+    }
+    
+    public void m2() {
+        System.out.println("B.m2");
+    }
+}
+
+public class Test {
+    public static void main(String[] args) {
+        A obj = new B();
+        obj.m2();
+    }
+}`,
+                options: [
+                    "A) Stampa: B.m2",
+                    "B) Errore a compilazione: m2 non visibile in A",
+                    "C) Stampa: B.m1",
+                    "D) NullPointerException"
+                ],
+                correct: 1
+            },
+            {
+                question: "Cosa stampa il seguente programma?",
+                code: `class Parent {
+    void print() {
+        System.out.println("Parent");
+    }
+}
+
+class Child extends Parent {
+    void print() {
+        System.out.println("Child");
+    }
+}
+
+public class Test {
+    public static void main(String[] args) {
+        Parent obj = new Child();
+        obj.print();
+    }
+}`,
+                options: [
+                    "A) Parent",
+                    "B) Child",
+                    "C) Errore a compilazione",
+                    "D) NullPointerException"
+                ],
+                correct: 1
+            },
+            {
+                question: "Cosa stampa questo programma?",
+                code: `class A {
+    String value = "A";
+    
+    void print() {
+        System.out.println(value);
+    }
+}
+
+class B extends A {
+    String value = "B";
+}
+
+public class Test {
+    public static void main(String[] args) {
+        A obj = new B();
+        obj.print();
+    }
+}`,
+                options: [
+                    "A) A",
+                    "B) B",
+                    "C) Errore a compilazione",
+                    "D) Null"
+                ],
+                correct: 0
+            },
+            {
+                question: "Cosa succede quando si esegue questo codice?",
+                code: `class Base {
+    static void show() {
+        System.out.println("Base");
+    }
+}
+
+class Derived extends Base {
+    static void show() {
+        System.out.println("Derived");
+    }
+}
+
+public class Test {
+    public static void main(String[] args) {
+        Base obj = new Derived();
+        obj.show();
+    }
+}`,
+                options: [
+                    "A) Stampa: Derived",
+                    "B) Stampa: Base",
+                    "C) Errore a compilazione",
+                    "D) Errore a runtime"
+                ],
+                correct: 1
+            },
+            {
+                question: "Qual è l'output di questo programma?",
+                code: `interface I {
+    default void print() {
+        System.out.println("I");
+    }
+}
+
+class C implements I {
+    public void print() {
+        System.out.println("C");
+    }
+}
+
+public class Test {
+    public static void main(String[] args) {
+        I obj = new C();
+        obj.print();
+    }
+}`,
+                options: [
+                    "A) I",
+                    "B) C",
+                    "C) Errore a compilazione",
+                    "D) Null"
+                ],
+                correct: 1
+            },
+            {
+                question: "Cosa stampa il seguente programma?",
+                code: `class X {
+    void method(int a) {
+        System.out.println("X:int");
+    }
+}
+
+class Y extends X {
+    void method(double d) {
+        System.out.println("Y:double");
+    }
+}
+
+public class Test {
+    public static void main(String[] args) {
+        Y y = new Y();
+        y.method(10);
+    }
+}`,
+                options: [
+                    "A) X:int",
+                    "B) Y:double",
+                    "C) Errore a compilazione",
+                    "D) Errore a runtime"
+                ],
+                correct: 0
+            },
+            {
+                question: "Cosa succede eseguendo questo codice?",
+                code: `class Alpha {
+    void display() {
+        System.out.println("Alpha");
+    }
+}
+
+class Beta extends Alpha {
+    void display() {
+        System.out.println("Beta");
+    }
+    
+    void show() {
+        System.out.println("Show");
+    }
+}
+
+public class Test {
+    public static void main(String[] args) {
+        Alpha a = new Beta();
+        a.show();
+    }
+}`,
+                options: [
+                    "A) Stampa: Show",
+                    "B) Errore a compilazione",
+                    "C) Stampa: Beta",
+                    "D) NullPointerException"
+                ],
+                correct: 1
+            },
+            {
+                question: "Qual è l'output di questo programma?",
+                code: `class Parent {
+    void print() {
+        System.out.println("Parent.print");
+    }
+}
+
+class Child extends Parent {
+    void print() {
+        super.print();
+        System.out.println("Child.print");
+    }
+}
+
+public class Test {
+    public static void main(String[] args) {
+        Parent obj = new Child();
+        obj.print();
+    }
+}`,
+                options: [
+                    "A) Parent.print",
+                    "B) Child.print",
+                    "C) Parent.print\\nChild.print",
+                    "D) Errore a compilazione"
+                ],
+                correct: 2
+            },
+            {
+                question: "Cosa stampa il seguente programma?",
+                code: `class A {
+    A() {
+        System.out.println("A");
+    }
+}
+
+class B extends A {
+    B() {
+        System.out.println("B");
+    }
+}
+
+public class Test {
+    public static void main(String[] args) {
+        B b = new B();
+    }
+}`,
+                options: [
+                    "A) A\\nB",
+                    "B) B\\nA",
+                    "C) A",
+                    "D) B"
+                ],
+                correct: 0
+            },
+            {
+                question: "Cosa succede quando si esegue questo codice?",
+                code: `final class FinalClass {
+    void method() {
+        System.out.println("FinalClass");
+    }
+}
+
+class SubClass extends FinalClass {
+    void method() {
+        System.out.println("SubClass");
+    }
+}
+
+public class Test {
+    public static void main(String[] args) {
+        FinalClass obj = new SubClass();
+        obj.method();
+    }
+}`,
+                options: [
+                    "A) Stampa: SubClass",
+                    "B) Stampa: FinalClass",
+                    "C) Errore a compilazione",
+                    "D) Errore a runtime"
+                ],
+                correct: 2
+            },
+            {
+                question: "Qual è l'output di questo programma?",
+                code: `class One {
+    void calculate(int x) {
+        System.out.println(x * x);
+    }
+}
+
+class Two extends One {
+    void calculate(int x) {
+        System.out.println(x * x * x);
+    }
+}
+
+public class Test {
+    public static void main(String[] args) {
+        One obj = new Two();
+        obj.calculate(5);
+    }
+}`,
+                options: [
+                    "A) 25",
+                    "B) 125",
+                    "C) Errore a compilazione",
+                    "D) 0"
+                ],
+                correct: 1
+            },
+            {
+                question: "Cosa stampa il seguente programma?",
+                code: `class Base {
+    String name = "Base";
+    
+    Base() {
+        print();
+    }
+    
+    void print() {
+        System.out.println(name);
+    }
+}
+
+class Derived extends Base {
+    String name = "Derived";
+    
+    void print() {
+        System.out.println(name);
+    }
+}
+
+public class Test {
+    public static void main(String[] args) {
+        new Derived();
+    }
+}`,
+                options: [
+                    "A) Base",
+                    "B) Derived",
+                    "C) null",
+                    "D) Errore a runtime"
+                ],
+                correct: 2
+            },
+            {
+                question: "Cosa succede eseguendo questo codice?",
+                code: `abstract class Shape {
+    abstract void draw();
+}
+
+class Circle extends Shape {
+    void draw() {
+        System.out.println("Drawing Circle");
+    }
+}
+
+public class Test {
+    public static void main(String[] args) {
+        Shape s = new Circle();
+        s.draw();
+    }
+}`,
+                options: [
+                    "A) Drawing Circle",
+                    "B) Errore a compilazione",
+                    "C) NullPointerException",
+                    "D) Nessun output"
+                ],
+                correct: 0
+            },
+            {
+                question: "Qual è l'output di questo programma?",
+                code: `class A {
+    void m() {
+        System.out.println("A.m");
+    }
+}
+
+class B extends A {
+    void m() {
+        System.out.println("B.m");
+    }
+    
+    void test() {
+        super.m();
+    }
+}
+
+public class Test {
+    public static void main(String[] args) {
+        B b = new B();
+        b.test();
+    }
+}`,
+                options: [
+                    "A) A.m",
+                    "B) B.m",
+                    "C) Errore a compilazione",
+                    "D) Nessun output"
+                ],
+                correct: 0
+            },
+            {
+                question: "Cosa stampa il seguente programma?",
+                code: `class Super {
+    int x = 1;
+    
+    void print() {
+        System.out.println(x);
+    }
+}
+
+class Sub extends Super {
+    int x = 2;
+}
+
+public class Test {
+    public static void main(String[] args) {
+        Super obj = new Sub();
+        obj.print();
+    }
+}`,
+                options: [
+                    "A) 1",
+                    "B) 2",
+                    "C) Errore a compilazione",
+                    "D) 0"
+                ],
+                correct: 0
+            },
+            {
+                question: "Cosa succede quando si esegue questo codice?",
+                code: `class P {
+    private void method() {
+        System.out.println("P.method");
+    }
+}
+
+class Q extends P {
+    public void method() {
+        System.out.println("Q.method");
+    }
+}
+
+public class Test {
+    public static void main(String[] args) {
+        P p = new Q();
+        p.method();
+    }
+}`,
+                options: [
+                    "A) P.method",
+                    "B) Q.method",
+                    "C) Errore a compilazione",
+                    "D) Errore a runtime"
+                ],
+                correct: 2
+            },
+            {
+                question: "Qual è l'output di questo programma?",
+                code: `class M {
+    void process() {
+        System.out.println("M.process");
+    }
+}
+
+class N extends M {
+    void process() {
+        System.out.println("N.process");
+    }
+    
+    void execute() {
+        process();
+        super.process();
+    }
+}
+
+public class Test {
+    public static void main(String[] args) {
+        N n = new N();
+        n.execute();
+    }
+}`,
+                options: [
+                    "A) M.process\\nN.process",
+                    "B) N.process\\nM.process",
+                    "C) N.process\\nN.process",
+                    "D) Errore a compilazione"
+                ],
+                correct: 1
+            },
+            {
+                question: "Cosa stampa il seguente programma?",
+                code: `interface Drawable {
+    default void draw() {
+        System.out.println("Drawable");
+    }
+}
+
+class Circle implements Drawable {
+    public void draw() {
+        System.out.println("Circle");
+    }
+}
+
+public class Test {
+    public static void main(String[] args) {
+        Drawable d = new Circle();
+        d.draw();
+    }
+}`,
+                options: [
+                    "A) Drawable",
+                    "B) Circle",
+                    "C) Errore a compilazione",
+                    "D) Nessun output"
+                ],
+                correct: 1
+            },
+            {
+                question: "Cosa succede eseguendo questo codice?",
+                code: `class Alpha {
+    void display() {
+        System.out.println("Alpha");
+    }
+}
+
+class Beta extends Alpha {
+    void display() {
+        System.out.println("Beta");
+    }
+}
+
+class Gamma extends Beta {
+    void display() {
+        System.out.println("Gamma");
+    }
+}
+
+public class Test {
+    public static void main(String[] args) {
+        Alpha a = new Gamma();
+        a.display();
+    }
+}`,
+                options: [
+                    "A) Alpha",
+                    "B) Beta",
+                    "C) Gamma",
+                    "D) Errore a compilazione"
+                ],
+                correct: 2
+            },
+            {
+                question: "Qual è l'output di questo programma?",
+                code: `class A {
+    static void method() {
+        System.out.println("A.method");
+    }
+}
+
+class B extends A {
+    static void method() {
+        System.out.println("B.method");
+    }
+}
+
+public class Test {
+    public static void main(String[] args) {
+        A a = new B();
+        a.method();
+    }
+}`,
+                options: [
+                    "A) A.method",
+                    "B) B.method",
+                    "C) Errore a compilazione",
+                    "D) NullPointerException"
+                ],
+                correct: 0
+            },
+            {
+                question: "Cosa stampa il seguente programma?",
+                code: `class Parent {
+    Parent() {
+        System.out.println("Parent Constructor");
+    }
+    
+    {
+        System.out.println("Parent Initializer");
+    }
+}
+
+class Child extends Parent {
+    Child() {
+        System.out.println("Child Constructor");
+    }
+    
+    {
+        System.out.println("Child Initializer");
+    }
+}
+
+public class Test {
+    public static void main(String[] args) {
+        new Child();
+    }
+}`,
+                options: [
+                    "A) Parent Constructor\\nChild Constructor",
+                    "B) Parent Initializer\\nParent Constructor\\nChild Initializer\\nChild Constructor",
+                    "C) Child Constructor\\nParent Constructor",
+                    "D) Errore a compilazione"
+                ],
+                correct: 1
+            },
+            {
+                question: "Cosa succede quando si esegue questo codice?",
+                code: `abstract class Vehicle {
+    abstract void run();
+}
+
+class Car extends Vehicle {
+    void run() {
+        System.out.println("Car running");
+    }
+}
+
+public class Test {
+    public static void main(String[] args) {
+        Vehicle v = new Car();
+        v.run();
+    }
+}`,
+                options: [
+                    "A) Car running",
+                    "B) Errore a compilazione",
+                    "C) Errore a runtime",
+                    "D) Nessun output"
+                ],
+                correct: 0
+            },
+            {
+                question: "Qual è l'output di questo programma?",
+                code: `class X {
+    int i = 10;
+}
+
+class Y extends X {
+    int i = 20;
+}
+
+public class Test {
+    public static void main(String[] args) {
+        X x = new Y();
+        System.out.println(x.i);
+    }
+}`,
+                options: [
+                    "A) 10",
+                    "B) 20",
+                    "C) Errore a compilazione",
+                    "D) 0"
+                ],
+                correct: 0
+            },
+            {
+                question: "Cosa stampa il seguente programma?",
+                code: `class A {
+    void m1() {
+        System.out.println("A.m1");
+    }
+}
+
+class B extends A {
+    void m1() {
+        System.out.println("B.m1");
+    }
+    
+    void m2() {
+        this.m1();
+        super.m1();
+    }
+}
+
+public class Test {
+    public static void main(String[] args) {
+        B b = new B();
+        b.m2();
+    }
+}`,
+                options: [
+                    "A) A.m1\\nA.m1",
+                    "B) B.m1\\nA.m1",
+                    "C) A.m1\\nB.m1",
+                    "D) B.m1\\nB.m1"
+                ],
+                correct: 1
+            },
+            {
+                question: "Cosa succede eseguendo questo codice?",
+                code: `class Parent {
+    void print() {
+        System.out.println("Parent");
+    }
+}
+
+class Child extends Parent {
+    void print() {
+        System.out.println("Child");
+    }
+}
+
+public class Test {
+    public static void main(String[] args) {
+        Parent p = new Parent();
+        Child c = (Child) p;
+        c.print();
+    }
+}`,
+                options: [
+                    "A) Stampa: Parent",
+                    "B) Stampa: Child",
+                    "C) Errore a compilazione",
+                    "D) ClassCastException"
+                ],
+                correct: 3
+            },
+            {
+                question: "Qual è l'output di questo programma?",
+                code: `class One {
+    One() {
+        System.out.println("One");
+    }
+}
+
+class Two extends One {
+    Two() {
+        System.out.println("Two");
+    }
+}
+
+class Three extends Two {
+    Three() {
+        System.out.println("Three");
+    }
+}
+
+public class Test {
+    public static void main(String[] args) {
+        new Three();
+    }
+}`,
+                options: [
+                    "A) Three",
+                    "B) One\\nTwo\\nThree",
+                    "C) Three\\nTwo\\nOne",
+                    "D) Errore a compilazione"
+                ],
+                correct: 1
+            },
+            {
+                question: "Cosa stampa il seguente programma?",
+                code: `class Base {
+    static void show() {
+        System.out.println("Base.show");
+    }
+}
+
+class Derived extends Base {
+    static void show() {
+        System.out.println("Derived.show");
+    }
+}
+
+public class Test {
+    public static void main(String[] args) {
+        Base b = new Derived();
+        b.show();
+        Derived d = (Derived) b;
+        d.show();
+    }
+}`,
+                options: [
+                    "A) Base.show\\nDerived.show",
+                    "B) Derived.show\\nDerived.show",
+                    "C) Base.show\\nBase.show",
+                    "D) Errore a runtime"
+                ],
+                correct: 0
+            },
+            {
+                question: "Cosa succede quando si esegue questo codice?",
+                code: `interface I {
+    void method();
+}
+
+class C implements I {
+    public void method() {
+        System.out.println("C.method");
+    }
+}
+
+public class Test {
+    public static void main(String[] args) {
+        I i = new C();
+        i.method();
+    }
+}`,
+                options: [
+                    "A) C.method",
+                    "B) Errore a compilazione",
+                    "C) NullPointerException",
+                    "D) Nessun output"
+                ],
+                correct: 0
+            },
+            {
+                question: "Qual è l'output di questo programma?",
+                code: `class A {
+    A() {
+        System.out.println("A");
+    }
+}
+
+class B extends A {
+    B() {
+        this("B");
+        System.out.println("B1");
+    }
+    
+    B(String s) {
+        System.out.println(s);
+    }
+}
+
+public class Test {
+    public static void main(String[] args) {
+        new B();
+    }
+}`,
+                options: [
+                    "A) A\\nB\\nB1",
+                    "B) B\\nB1\\nA",
+                    "C) A\\nB1\\nB",
+                    "D) Errore a compilazione"
+                ],
+                correct: 0
+            },
+            {
+                question: "Cosa stampa il seguente programma?",
+                code: `class X {
+    void print() {
+        System.out.println("X");
+    }
+}
+
+class Y extends X {
+    void print() {
+        System.out.println("Y");
+    }
+}
+
+class Z extends Y {
+    void print() {
+        System.out.println("Z");
+    }
+}
+
+public class Test {
+    public static void main(String[] args) {
+        X x = new Z();
+        x.print();
+    }
+}`,
+                options: [
+                    "A) X",
+                    "B) Y",
+                    "C) Z",
+                    "D) Errore a compilazione"
+                ],
+                correct: 2
+            }
+        ];
+
+        // Funzione per inizializzare il quiz
+        function initQuiz() {
+            const quizContainer = document.getElementById('quiz-container');
+            quizContainer.innerHTML = '';
+            
+            // Aggiorna i contatori
+            document.getElementById('total-questions').textContent = questions.length;
+            
+            // Crea le domande
+            questions.forEach((q, index) => {
+                const questionEl = document.createElement('div');
+                questionEl.className = 'question';
+                
+                // Formatta il codice con numeri di riga
+                let formattedCode = '';
+                if (q.code) {
+                    const lines = q.code.split('\n');
+                    formattedCode = '<div class="code-block"><div>' + 
+                        lines.join('</div><div>') + 
+                        '</div></div>';
+                } else {
+                    formattedCode = '<div class="code-block"><div>// Nessun codice per questa domanda</div></div>';
+                }
+                
+                questionEl.innerHTML = `
+                    <div class="question-header">
+                        <div class="question-number">Domanda ${index + 1}</div>
+                    </div>
+                    <div class="question-text">${q.question}</div>
+                    ${formattedCode}
+                    <div class="options">
+                        ${q.options.map((option, i) => `
+                            <div class="option" data-index="${i}">
+                                <input type="radio" id="q${index}_opt${i}" name="q${index}" value="${i}">
+                                <label for="q${index}_opt${i}">${option}</label>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+                quizContainer.appendChild(questionEl);
+                
+                // Aggiungi event listener per le opzioni
+                const options = questionEl.querySelectorAll('.option');
+                options.forEach(option => {
+                    option.addEventListener('click', function() {
+                        // Deseleziona tutte le opzioni in questa domanda
+                        options.forEach(opt => opt.classList.remove('selected'));
+                        
+                        // Seleziona l'opzione corrente
+                        this.classList.add('selected');
+                        const input = this.querySelector('input');
+                        input.checked = true;
+                        
+                        // Aggiorna il contatore delle risposte
+                        updateAnsweredCount();
+                    });
+                });
+            });
+            
+            // Aggiorna il contatore iniziale
+            updateAnsweredCount();
+        }
+
+        // Aggiorna il contatore delle risposte
+        function updateAnsweredCount() {
+            const answered = document.querySelectorAll('input[type="radio"]:checked').length;
+            document.getElementById('answered-questions').textContent = answered;
+            
+            // Aggiorna la barra di avanzamento
+            const progress = (answered / questions.length) * 100;
+            document.getElementById('progress-bar').style.width = `${progress}%`;
+        }
+
+        // Correggi il test
+        function checkQuiz() {
+            const results = [];
+            let score = 0;
+            
+            questions.forEach((q, index) => {
+                const selectedOption = document.querySelector(`input[name="q${index}"]:checked`);
+                const selectedIndex = selectedOption ? parseInt(selectedOption.value) : -1;
+                const isCorrect = selectedIndex === q.correct;
+                
+                if (isCorrect) score++;
+                
+                results.push({
+                    question: q.question,
+                    selected: selectedIndex !== -1 ? q.options[selectedIndex] : "Nessuna risposta",
+                    correct: q.options[q.correct],
+                    isCorrect: isCorrect
+                });
+            });
+            
+            // Mostra i risultati
+            showResults(score, results);
+        }
+
+        // Mostra i risultati
+        function showResults(score, results) {
+            const scoreDisplay = document.getElementById('score');
+            const resultsDetails = document.getElementById('results-details');
+            
+            // Calcola la percentuale
+            const percentage = Math.round((score / questions.length) * 100);
+            
+            // Mostra il punteggio
+            scoreDisplay.textContent = `Punteggio: ${score}/${questions.length} (${percentage}%)`;
+            
+            // Mostra il dettaglio delle risposte
+            resultsDetails.innerHTML = '';
+            results.forEach((result, index) => {
+                const resultItem = document.createElement('div');
+                resultItem.className = `result-item ${result.isCorrect ? 'correct' : 'incorrect'}`;
+                resultItem.innerHTML = `
+                    <div class="result-status">${index + 1}</div>
+                    <div class="result-details">
+                        <div class="result-question">${result.question}</div>
+                        <div class="result-answer">
+                            <strong>La tua risposta:</strong> ${result.selected}<br>
+                            <strong>Risposta corretta:</strong> ${result.correct}
+                        </div>
+                    </div>
+                `;
+                resultsDetails.appendChild(resultItem);
+            });
+            
+            // Mostra la sezione risultati
+            document.getElementById('results').style.display = 'block';
+            
+            // Scrolla fino ai risultati
+            document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
+            
+            // Evidenzia i risultati
+            setTimeout(() => {
+                document.getElementById('results').classList.add('highlight');
+                setTimeout(() => {
+                    document.getElementById('results').classList.remove('highlight');
+                }, 1500);
+            }, 300);
+        }
+
+        // Reset del test
+        function resetQuiz() {
+            // Deseleziona tutte le risposte
+            document.querySelectorAll('input[type="radio"]').forEach(input => {
+                input.checked = false;
+            });
+            
+            // Rimuovi le selezioni visive
+            document.querySelectorAll('.option').forEach(option => {
+                option.classList.remove('selected');
+            });
+            
+            // Nascondi i risultati
+            document.getElementById('results').style.display = 'none';
+            
+            // Resetta la barra di avanzamento
+            document.getElementById('progress-bar').style.width = '0%';
+            
+            // Aggiorna i contatori
+            updateAnsweredCount();
+            
+            // Scrolla in cima alla pagina
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Inizializza il quiz quando la pagina è caricata
+        document.addEventListener('DOMContentLoaded', () => {
+            initQuiz();
+            
+            // Aggiungi event listener per il pulsante di correzione
+            document.getElementById('check-btn').addEventListener('click', checkQuiz);
+            
+            // Aggiungi event listener per il pulsante di reset
+            document.getElementById('reset-btn').addEventListener('click', resetQuiz);
+        });
+    </script>
+</body>
+</html>

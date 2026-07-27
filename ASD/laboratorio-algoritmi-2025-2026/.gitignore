@@ -1,0 +1,23 @@
+# General files
+*.csv
+*.txt
+*.docx
+*.xml
+*.iml
+*.png
+*.bin
+
+# IDE
+.idea/
+.vscode/
+
+# Directories
+**/build
+**/bin
+**/obj
+
+# Generated files
+*.class
+bin/**
+build/
+bin/

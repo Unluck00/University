@@ -1,0 +1,1369 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Java: Gestione delle Eccezioni</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #2c3e50, #4a235a);
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background-color: rgba(255, 255, 255, 0.97);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+            padding: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .container::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 10px;
+            background: linear-gradient(90deg, #2c3e50, #4a235a);
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #eaeaea;
+        }
+        
+        h1 {
+            color: #2c3e50;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .subtitle {
+            color: #4a235a;
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+        }
+        
+        .instructions {
+            background-color: #e9f7fe;
+            border-left: 5px solid #2c3e50;
+            padding: 15px;
+            margin-bottom: 30px;
+            border-radius: 0 8px 8px 0;
+            font-size: 1.05rem;
+        }
+        
+        .quiz-stats {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            padding: 10px;
+            background-color: #f0f8ff;
+            border-radius: 8px;
+            font-weight: bold;
+        }
+        
+        .question {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+        }
+        
+        .question:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+            border-left: 5px solid #4a235a;
+        }
+        
+        .question-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+        
+        .question-number {
+            font-weight: bold;
+            color: #2c3e50;
+            font-size: 1.3rem;
+            background-color: #e3f2fd;
+            padding: 5px 12px;
+            border-radius: 20px;
+        }
+        
+        .question-text {
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+            line-height: 1.8;
+        }
+        
+        .code-block {
+            background-color: #2d2d2d;
+            color: #f8f8f2;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            overflow-x: auto;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+            white-space: pre;
+            position: relative;
+        }
+        
+        .options {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+            margin-top: 20px;
+        }
+        
+        .option {
+            padding: 14px 18px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            font-size: 1.05rem;
+        }
+        
+        .option:hover {
+            background-color: #f5f9ff;
+            border-color: #aac;
+        }
+        
+        .option.selected {
+            background-color: #e3f2fd;
+            border-color: #4a235a;
+            font-weight: bold;
+            transform: scale(1.02);
+        }
+        
+        .option input {
+            margin-right: 12px;
+            cursor: pointer;
+            transform: scale(1.3);
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+        
+        button {
+            padding: 15px 35px;
+            font-size: 1.1rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        #check-btn {
+            background: linear-gradient(to right, #2c3e50, #4a235a);
+            color: white;
+        }
+        
+        #reset-btn {
+            background: linear-gradient(to right, #555, #333);
+            color: white;
+        }
+        
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        button:active {
+            transform: translateY(1px);
+        }
+        
+        .results {
+            margin-top: 40px;
+            padding: 30px;
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            display: none;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .results h2 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 25px;
+            font-size: 2rem;
+        }
+        
+        .score-display {
+            text-align: center;
+            font-size: 2rem;
+            margin-bottom: 30px;
+            font-weight: bold;
+            color: #2c3e50;
+            padding: 15px;
+            border-radius: 10px;
+            background: linear-gradient(to right, #e3f2fd, #f0f8ff);
+        }
+        
+        .result-item {
+            padding: 18px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 15px;
+            border-radius: 8px;
+        }
+        
+        .result-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+        
+        .correct {
+            background-color: #e8f5e9;
+            border-left: 5px solid #4caf50;
+        }
+        
+        .incorrect {
+            background-color: #ffebee;
+            border-left: 5px solid #f44336;
+        }
+        
+        .result-status {
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            min-width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            margin-right: 15px;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+        
+        .correct .result-status {
+            background-color: #4caf50;
+            color: white;
+        }
+        
+        .incorrect .result-status {
+            background-color: #f44336;
+            color: white;
+        }
+        
+        .result-details {
+            flex-grow: 1;
+        }
+        
+        .result-question {
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #2c3e50;
+        }
+        
+        .result-answer {
+            color: #555;
+            line-height: 1.6;
+        }
+        
+        .result-answer strong {
+            color: #333;
+        }
+        
+        .progress-container {
+            height: 12px;
+            background-color: #e0e0e0;
+            border-radius: 6px;
+            margin: 30px 0;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(to right, #4a235a, #2c3e50);
+            border-radius: 6px;
+            transition: width 0.5s ease;
+        }
+        
+        .highlight {
+            animation: highlight 1.5s ease;
+        }
+        
+        @keyframes highlight {
+            0% { background-color: rgba(255, 255, 0, 0.3); }
+            100% { background-color: transparent; }
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+            
+            .controls {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            button {
+                width: 100%;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .code-block {
+                font-size: 0.85rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Quiz Java: Gestione delle Eccezioni</h1>
+            <p class="subtitle">30 domande su try-catch, finally e gestione degli errori</p>
+        </header>
+        
+        <div class="instructions">
+            <p><strong>Istruzioni:</strong> Per ogni domanda, seleziona l'output corretto del programma Java. Al termine del test, clicca su "Correggi Test" per vedere i risultati. Puoi modificare le risposte prima di correggere il test.</p>
+        </div>
+        
+        <div class="quiz-stats">
+            <div>Domande: <span id="total-questions">0</span>/30</div>
+            <div>Risposte: <span id="answered-questions">0</span></div>
+        </div>
+        
+        <div id="quiz-container">
+            <!-- Le domande verranno generate dinamicamente con JavaScript -->
+        </div>
+        
+        <div class="controls">
+            <button id="check-btn">Correggi Test</button>
+            <button id="reset-btn">Ricomincia Test</button>
+        </div>
+        
+        <div class="progress-container">
+            <div id="progress-bar" class="progress-bar" style="width: 0%"></div>
+        </div>
+        
+        <div id="results" class="results">
+            <h2>Risultati del Test</h2>
+            <div id="score" class="score-display"></div>
+            <div id="results-details"></div>
+        </div>
+    </div>
+
+    <script>
+        // Array di domande e risposte focalizzate sulle eccezioni
+        const questions = [
+            {
+                question: "Qual è l'output del seguente programma?",
+                code: `public class EX3 {
+    public static void m1() {
+        try {
+            System.out.println("A");
+            throw new IOException();
+        } catch (IOException e) {
+            System.out.println("B");
+            throw new RuntimeException();
+        } finally {
+            System.out.println("C");
+        }
+    }
+    
+    public static void main(String[] args) {
+        try {
+            m1();
+        } catch (RuntimeException e) {
+            System.out.println("D");
+        }
+    }
+}`,
+                options: [
+                    "A) A, B, C, D",
+                    "B) A, B, D",
+                    "C) A, B, C",
+                    "D) C, A, B, D",
+                    "E) A, C, B, D"
+                ],
+                correct: 0
+            },
+            {
+                question: "Cosa viene stampato dal programma?",
+                code: `public class Test {
+    public static void main(String[] args) {
+        try {
+            System.out.println("Start");
+            int result = 10 / 0;
+            System.out.println("Result: " + result);
+        } catch (ArithmeticException e) {
+            System.out.println("Error: Division by zero");
+        } finally {
+            System.out.println("Finally block");
+        }
+        System.out.println("End");
+    }
+}`,
+                options: [
+                    "A) Start, Result: 10, End",
+                    "B) Start, Error: Division by zero, Finally block, End",
+                    "C) Start, Error: Division by zero, End",
+                    "D) Start, Finally block, Error: Division by zero, End"
+                ],
+                correct: 1
+            },
+            {
+                question: "Qual è l'output di questo programma?",
+                code: `public class Test {
+    public static void main(String[] args) {
+        try {
+            System.out.println("Try block");
+            return;
+        } catch (Exception e) {
+            System.out.println("Catch block");
+        } finally {
+            System.out.println("Finally block");
+        }
+        System.out.println("After try-catch");
+    }
+}`,
+                options: [
+                    "A) Try block, Finally block",
+                    "B) Try block, Catch block, Finally block",
+                    "C) Try block, Finally block, After try-catch",
+                    "D) Try block, Catch block, Finally block, After try-catch"
+                ],
+                correct: 0
+            },
+            {
+                question: "Cosa succede quando si esegue questo codice?",
+                code: `public class Test {
+    public static void main(String[] args) {
+        try {
+            throw new NullPointerException();
+        } catch (ArithmeticException e) {
+            System.out.println("ArithmeticException caught");
+        } finally {
+            System.out.println("Finally block executed");
+        }
+    }
+}`,
+                options: [
+                    "A) Viene stampato: Finally block executed",
+                    "B) Viene stampato: ArithmeticException caught",
+                    "C) Viene stampato: ArithmeticException caught e Finally block executed",
+                    "D) Il programma termina con un errore"
+                ],
+                correct: 3
+            },
+            {
+                question: "Qual è l'output del programma?",
+                code: `public class Test {
+    public static void main(String[] args) {
+        try {
+            System.out.println("A");
+            int[] arr = new int[5];
+            arr[10] = 50;
+        } catch (ArrayIndexOutOfBoundsException e) {
+            System.out.println("B");
+        } catch (Exception e) {
+            System.out.println("C");
+        } finally {
+            System.out.println("D");
+        }
+        System.out.println("E");
+    }
+}`,
+                options: [
+                    "A) A, B, D, E",
+                    "B) A, C, D, E",
+                    "C) A, B, E",
+                    "D) A, D, E"
+                ],
+                correct: 0
+            },
+            {
+                question: "Cosa viene stampato?",
+                code: `public class Test {
+    public static void main(String[] args) {
+        try {
+            throw new IOException("Custom IO error");
+        } catch (IOException e) {
+            System.out.println("Caught: " + e.getMessage());
+            throw new RuntimeException("Runtime error");
+        } finally {
+            System.out.println("Finally executed");
+        }
+    }
+}`,
+                options: [
+                    "A) Caught: Custom IO error, Finally executed",
+                    "B) Caught: Custom IO error",
+                    "C) Caught: Custom IO error, Finally executed, poi eccezione non gestita",
+                    "D) Nessun output, solo eccezione"
+                ],
+                correct: 2
+            },
+            {
+                question: "Qual è l'output di questo programma?",
+                code: `public class Test {
+    static void method() {
+        try {
+            System.out.println("A");
+            throw new RuntimeException();
+        } finally {
+            System.out.println("B");
+        }
+    }
+    
+    public static void main(String[] args) {
+        try {
+            method();
+        } catch (RuntimeException e) {
+            System.out.println("C");
+        }
+    }
+}`,
+                options: [
+                    "A) A, B, C",
+                    "B) A, C",
+                    "C) B, C",
+                    "D) A, B"
+                ],
+                correct: 0
+            },
+            {
+                question: "Cosa succede durante l'esecuzione?",
+                code: `public class Test {
+    public static void main(String[] args) {
+        try {
+            System.out.println("Start");
+            throw new Error("Critical error");
+        } catch (Exception e) {
+            System.out.println("Exception caught");
+        } finally {
+            System.out.println("Finally block");
+        }
+        System.out.println("End");
+    }
+}`,
+                options: [
+                    "A) Start, Exception caught, Finally block, End",
+                    "B) Start, Finally block, poi eccezione non gestita",
+                    "C) Start, Exception caught, Finally block",
+                    "D) Start, Finally block, End"
+                ],
+                correct: 1
+            },
+            {
+                question: "Qual è l'output del programma?",
+                code: `public class Test {
+    public static void main(String[] args) {
+        try {
+            System.out.println("A");
+            throw new IllegalArgumentException();
+        } catch (IllegalArgumentException e) {
+            System.out.println("B");
+            return;
+        } catch (Exception e) {
+            System.out.println("C");
+        } finally {
+            System.out.println("D");
+        }
+        System.out.println("E");
+    }
+}`,
+                options: [
+                    "A) A, B, D, E",
+                    "B) A, B, D",
+                    "C) A, B, E",
+                    "D) A, C, D, E"
+                ],
+                correct: 1
+            },
+            {
+                question: "Cosa viene stampato?",
+                code: `public class Test {
+    public static void main(String[] args) {
+        try {
+            System.out.println("Try 1");
+            try {
+                System.out.println("Try 2");
+                throw new Exception();
+            } finally {
+                System.out.println("Finally 2");
+            }
+        } catch (Exception e) {
+            System.out.println("Catch");
+        } finally {
+            System.out.println("Finally 1");
+        }
+    }
+}`,
+                options: [
+                    "A) Try 1, Try 2, Finally 2, Catch, Finally 1",
+                    "B) Try 1, Try 2, Catch, Finally 2, Finally 1",
+                    "C) Try 1, Try 2, Finally 2, Finally 1, Catch",
+                    "D) Try 1, Try 2, Finally 1, Catch"
+                ],
+                correct: 0
+            },
+            {
+                question: "Qual è l'output di questo programma?",
+                code: `public class Test {
+    public static void main(String[] args) {
+        try {
+            System.out.println("A");
+            System.exit(0);
+        } finally {
+            System.out.println("B");
+        }
+    }
+}`,
+                options: [
+                    "A) A, B",
+                    "B) A",
+                    "C) B",
+                    "D) Nessun output"
+                ],
+                correct: 1
+            },
+            {
+                question: "Cosa succede durante l'esecuzione?",
+                code: `public class Test {
+    static void riskyMethod() throws IOException {
+        throw new IOException("IO error");
+    }
+    
+    public static void main(String[] args) {
+        try {
+            riskyMethod();
+            System.out.println("Success");
+        } catch (IOException e) {
+            System.out.println("IO Exception caught");
+        } catch (Exception e) {
+            System.out.println("General Exception caught");
+        }
+    }
+}`,
+                options: [
+                    "A) Success",
+                    "B) IO Exception caught",
+                    "C) General Exception caught",
+                    "D) Errore di compilazione"
+                ],
+                correct: 1
+            },
+            {
+                question: "Qual è l'output del programma?",
+                code: `public class Test {
+    public static void main(String[] args) {
+        try {
+            int x = Integer.parseInt("abc");
+            System.out.println("Parsed: " + x);
+        } catch (NumberFormatException e) {
+            System.out.println("Invalid number");
+        } finally {
+            System.out.println("Cleanup");
+        }
+    }
+}`,
+                options: [
+                    "A) Parsed: 0",
+                    "B) Invalid number",
+                    "C) Invalid number, Cleanup",
+                    "D) Nessun output"
+                ],
+                correct: 2
+            },
+            {
+                question: "Cosa viene stampato?",
+                code: `public class Test {
+    public static void main(String[] args) {
+        try {
+            System.out.println("A");
+            throw new RuntimeException();
+        } catch (RuntimeException e) {
+            System.out.println("B");
+            throw e;
+        } finally {
+            System.out.println("C");
+        }
+    }
+}`,
+                options: [
+                    "A) A, B, C",
+                    "B) A, B, C, poi eccezione non gestita",
+                    "C) A, B, poi eccezione non gestita",
+                    "D) A, C, B, poi eccezione non gestita"
+                ],
+                correct: 1
+            },
+            {
+                question: "Qual è l'output di questo programma?",
+                code: `public class Test {
+    public static void main(String[] args) {
+        try {
+            System.out.println("Start");
+            String s = null;
+            System.out.println(s.length());
+        } catch (NullPointerException e) {
+            System.out.println("Null pointer caught");
+            throw new RuntimeException();
+        } catch (Exception e) {
+            System.out.println("General exception caught");
+        } finally {
+            System.out.println("Finally block");
+        }
+    }
+}`,
+                options: [
+                    "A) Start, Null pointer caught, Finally block",
+                    "B) Start, Null pointer caught, Finally block, poi eccezione non gestita",
+                    "C) Start, General exception caught, Finally block",
+                    "D) Start, Null pointer caught"
+                ],
+                correct: 1
+            },
+            {
+                question: "Cosa succede durante l'esecuzione?",
+                code: `public class Test {
+    public static void main(String[] args) {
+        try {
+            throw new Exception("First");
+        } catch (Exception e) {
+            System.out.println("Caught: " + e.getMessage());
+            throw new Exception("Second");
+        } finally {
+            System.out.println("Finally");
+        }
+    }
+}`,
+                options: [
+                    "A) Caught: First, Finally",
+                    "B) Caught: First, Finally, poi eccezione non gestita",
+                    "C) Caught: First, Caught: Second, Finally",
+                    "D) Caught: First"
+                ],
+                correct: 1
+            },
+            {
+                question: "Qual è l'output del programma?",
+                code: `public class Test {
+    public static void main(String[] args) {
+        try {
+            System.out.println("A");
+            throw new ClassCastException();
+        } catch (RuntimeException e) {
+            System.out.println("B");
+        } catch (Exception e) {
+            System.out.println("C");
+        } finally {
+            System.out.println("D");
+        }
+        System.out.println("E");
+    }
+}`,
+                options: [
+                    "A) A, B, D, E",
+                    "B) A, C, D, E",
+                    "C) A, B, E",
+                    "D) A, D, E"
+                ],
+                correct: 0
+            },
+            {
+                question: "Cosa viene stampato?",
+                code: `public class Test {
+    static void method1() throws FileNotFoundException {
+        throw new FileNotFoundException();
+    }
+    
+    public static void main(String[] args) {
+        try {
+            method1();
+            System.out.println("A");
+        } catch (IOException e) {
+            System.out.println("B");
+        } finally {
+            System.out.println("C");
+        }
+    }
+}`,
+                options: [
+                    "A) A",
+                    "B) B, C",
+                    "C) C",
+                    "D) Errore di compilazione"
+                ],
+                correct: 1
+            },
+            {
+                question: "Qual è l'output di questo programma?",
+                code: `public class Test {
+    public static void main(String[] args) {
+        try {
+            System.out.println("Try start");
+            if (true) throw new RuntimeException();
+            System.out.println("Try end");
+        } finally {
+            System.out.println("Finally");
+        }
+        System.out.println("After");
+    }
+}`,
+                options: [
+                    "A) Try start, Finally",
+                    "B) Try start, Try end, Finally, After",
+                    "C) Try start, Finally, poi eccezione non gestita",
+                    "D) Try start, poi eccezione non gestita"
+                ],
+                correct: 2
+            },
+            {
+                question: "Cosa succede durante l'esecuzione?",
+                code: `public class Test {
+    public static void main(String[] args) {
+        try {
+            System.out.println("A");
+            throw new OutOfMemoryError();
+        } catch (Error e) {
+            System.out.println("B");
+        } finally {
+            System.out.println("C");
+        }
+        System.out.println("D");
+    }
+}`,
+                options: [
+                    "A) A, B, C, D",
+                    "B) A, C, D",
+                    "C) A, B, C",
+                    "D) A, poi eccezione non gestita"
+                ],
+                correct: 0
+            },
+            {
+                question: "Qual è l'output del programma?",
+                code: `public class Test {
+    public static void main(String[] args) {
+        try {
+            System.out.println("A");
+            throw new IllegalArgumentException();
+        } catch (IllegalStateException e) {
+            System.out.println("B");
+        } catch (RuntimeException e) {
+            System.out.println("C");
+        } finally {
+            System.out.println("D");
+        }
+    }
+}`,
+                options: [
+                    "A) A, B, D",
+                    "B) A, C, D",
+                    "C) A, D",
+                    "D) A, poi eccezione non gestita"
+                ],
+                correct: 1
+            },
+            {
+                question: "Cosa viene stampato?",
+                code: `public class Test {
+    public static void main(String[] args) {
+        try {
+            System.out.println("Start");
+            throw new Exception("Error 1");
+        } catch (Exception e) {
+            System.out.println("Catch 1: " + e.getMessage());
+            try {
+                throw new Exception("Error 2");
+            } catch (Exception ex) {
+                System.out.println("Catch 2: " + ex.getMessage());
+            } finally {
+                System.out.println("Inner finally");
+            }
+        } finally {
+            System.out.println("Outer finally");
+        }
+    }
+}`,
+                options: [
+                    "A) Start, Catch 1: Error 1, Outer finally",
+                    "B) Start, Catch 1: Error 1, Catch 2: Error 2, Inner finally, Outer finally",
+                    "C) Start, Catch 1: Error 1, Catch 2: Error 2, Outer finally",
+                    "D) Start, Catch 1: Error 1, Inner finally, Outer finally"
+                ],
+                correct: 1
+            },
+            {
+                question: "Qual è l'output di questo programma?",
+                code: `public class Test {
+    static void method() {
+        try {
+            System.out.println("A");
+            return;
+        } finally {
+            System.out.println("B");
+        }
+    }
+    
+    public static void main(String[] args) {
+        method();
+        System.out.println("C");
+    }
+}`,
+                options: [
+                    "A) A, B, C",
+                    "B) A, C",
+                    "C) B, C",
+                    "D) A, B"
+                ],
+                correct: 0
+            },
+            {
+                question: "Cosa succede durante l'esecuzione?",
+                code: `public class Test {
+    public static void main(String[] args) {
+        try {
+            System.out.println("Try");
+            throw new RuntimeException();
+        } catch (RuntimeException e) {
+            System.out.println("Catch");
+            throw e;
+        } finally {
+            System.out.println("Finally");
+        }
+    }
+}`,
+                options: [
+                    "A) Try, Catch, Finally",
+                    "B) Try, Catch, Finally, poi eccezione non gestita",
+                    "C) Try, Catch, poi eccezione non gestita",
+                    "D) Try, Finally, poi eccezione non gestita"
+                ],
+                correct: 1
+            },
+            {
+                question: "Qual è l'output del programma?",
+                code: `public class Test {
+    public static void main(String[] args) {
+        try {
+            System.out.println("A");
+            throw new IOException();
+        } catch (IOException | RuntimeException e) {
+            System.out.println("B");
+        } finally {
+            System.out.println("C");
+        }
+    }
+}`,
+                options: [
+                    "A) A, B, C",
+                    "B) A, C",
+                    "C) B, C",
+                    "D) Errore di compilazione"
+                ],
+                correct: 0
+            },
+            {
+                question: "Cosa viene stampato?",
+                code: `public class Test {
+    public static void main(String[] args) {
+        try {
+            System.out.println("Start");
+            throw new Error("Critical");
+        } catch (Throwable t) {
+            System.out.println("Caught: " + t.getMessage());
+        } finally {
+            System.out.println("Finally");
+        }
+        System.out.println("End");
+    }
+}`,
+                options: [
+                    "A) Start, Caught: Critical, Finally, End",
+                    "B) Start, Finally, End",
+                    "C) Start, Caught: Critical, Finally",
+                    "D) Start, poi eccezione non gestita"
+                ],
+                correct: 0
+            },
+            {
+                question: "Qual è l'output di questo programma?",
+                code: `public class Test {
+    public static void main(String[] args) {
+        try {
+            System.out.println("A");
+            throw new RuntimeException();
+        } catch (Exception e) {
+            System.out.println("B");
+        } finally {
+            try {
+                System.out.println("C");
+                throw new IOException();
+            } catch (IOException e) {
+                System.out.println("D");
+            }
+        }
+    }
+}`,
+                options: [
+                    "A) A, B, C, D",
+                    "B) A, B, C",
+                    "C) A, C, D",
+                    "D) A, B, D"
+                ],
+                correct: 0
+            },
+            {
+                question: "Cosa succede durante l'esecuzione?",
+                code: `public class Test {
+    public static void main(String[] args) {
+        try {
+            System.out.println("Try");
+            return;
+        } catch (Exception e) {
+            System.out.println("Catch");
+        } finally {
+            System.out.println("Finally");
+        }
+        System.out.println("After");
+    }
+}`,
+                options: [
+                    "A) Try, Finally, After",
+                    "B) Try, Catch, Finally, After",
+                    "C) Try, Finally",
+                    "D) Try, After"
+                ],
+                correct: 2
+            },
+            {
+                question: "Qual è l'output del programma?",
+                code: `public class Test {
+    public static void main(String[] args) {
+        try {
+            System.out.println("A");
+            throw new IllegalArgumentException();
+        } catch (IllegalArgumentException e) {
+            System.out.println("B");
+            throw new RuntimeException();
+        } catch (RuntimeException e) {
+            System.out.println("C");
+        } finally {
+            System.out.println("D");
+        }
+    }
+}`,
+                options: [
+                    "A) A, B, D, poi eccezione non gestita",
+                    "B) A, B, C, D",
+                    "C) A, B, D",
+                    "D) A, C, D"
+                ],
+                correct: 0
+            },
+            {
+                question: "Cosa viene stampato?",
+                code: `public class Test {
+    public static void main(String[] args) {
+        try {
+            System.out.println("Start");
+            throw new Exception("Ex1");
+        } catch (Exception e) {
+            System.out.println("Catch 1: " + e.getMessage());
+            try {
+                throw new Exception("Ex2");
+            } finally {
+                System.out.println("Inner finally");
+            }
+        } finally {
+            System.out.println("Outer finally");
+        }
+    }
+}`,
+                options: [
+                    "A) Start, Catch 1: Ex1, Inner finally, Outer finally, poi eccezione non gestita",
+                    "B) Start, Catch 1: Ex1, Inner finally, Outer finally",
+                    "C) Start, Catch 1: Ex1, Outer finally",
+                    "D) Start, Catch 1: Ex1, Inner finally"
+                ],
+                correct: 0
+            },
+            {
+                question: "Qual è l'output di questo programma?",
+                code: `public class Test {
+    public static void main(String[] args) {
+        try {
+            System.out.println("A");
+            int x = 1/0;
+        } catch (ArithmeticException e) {
+            System.out.println("B");
+        } catch (RuntimeException e) {
+            System.out.println("C");
+        } finally {
+            System.out.println("D");
+        }
+        System.out.println("E");
+    }
+}`,
+                options: [
+                    "A) A, B, D, E",
+                    "B) A, C, D, E",
+                    "C) A, B, E",
+                    "D) A, D, E"
+                ],
+                correct: 0
+            },
+            {
+                question: "Cosa succede durante l'esecuzione?",
+                code: `public class Test {
+    public static void main(String[] args) {
+        try {
+            System.out.println("Try");
+            System.exit(1);
+        } finally {
+            System.out.println("Finally");
+        }
+    }
+}`,
+                options: [
+                    "A) Try, Finally",
+                    "B) Try",
+                    "C) Finally",
+                    "D) Nessun output"
+                ],
+                correct: 1
+            },
+            {
+                question: "Qual è l'output del programma?",
+                code: `public class Test {
+    public static void main(String[] args) {
+        try {
+            System.out.println("Start");
+            throw new ClassNotFoundException();
+        } catch (ClassNotFoundException e) {
+            System.out.println("Class not found");
+        } catch (Exception e) {
+            System.out.println("General exception");
+        } finally {
+            System.out.println("Finally");
+        }
+    }
+}`,
+                options: [
+                    "A) Start, Class not found, Finally",
+                    "B) Start, General exception, Finally",
+                    "C) Start, Finally",
+                    "D) Start, Class not found"
+                ],
+                correct: 0
+            }
+        ];
+
+        // Funzione per inizializzare il quiz
+        function initQuiz() {
+            const quizContainer = document.getElementById('quiz-container');
+            quizContainer.innerHTML = '';
+            
+            // Aggiorna i contatori
+            document.getElementById('total-questions').textContent = questions.length;
+            
+            // Crea le domande
+            questions.forEach((q, index) => {
+                const questionEl = document.createElement('div');
+                questionEl.className = 'question';
+                
+                // Formatta il codice con numeri di riga
+                let formattedCode = '';
+                if (q.code) {
+                    formattedCode = `<div class="code-block">${q.code}</div>`;
+                } else {
+                    formattedCode = '<div class="code-block">// Nessun codice per questa domanda</div>';
+                }
+                
+                questionEl.innerHTML = `
+                    <div class="question-header">
+                        <div class="question-number">Domanda ${index + 1}</div>
+                    </div>
+                    <div class="question-text">${q.question}</div>
+                    ${formattedCode}
+                    <div class="options">
+                        ${q.options.map((option, i) => `
+                            <div class="option" data-index="${i}">
+                                <input type="radio" id="q${index}_opt${i}" name="q${index}" value="${i}">
+                                <label for="q${index}_opt${i}">${option}</label>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+                quizContainer.appendChild(questionEl);
+                
+                // Aggiungi event listener per le opzioni
+                const options = questionEl.querySelectorAll('.option');
+                options.forEach(option => {
+                    option.addEventListener('click', function() {
+                        // Deseleziona tutte le opzioni in questa domanda
+                        options.forEach(opt => opt.classList.remove('selected'));
+                        
+                        // Seleziona l'opzione corrente
+                        this.classList.add('selected');
+                        const input = this.querySelector('input');
+                        input.checked = true;
+                        
+                        // Aggiorna il contatore delle risposte
+                        updateAnsweredCount();
+                    });
+                });
+            });
+            
+            // Aggiorna il contatore iniziale
+            updateAnsweredCount();
+        }
+
+        // Aggiorna il contatore delle risposte
+        function updateAnsweredCount() {
+            const answered = document.querySelectorAll('input[type="radio"]:checked').length;
+            document.getElementById('answered-questions').textContent = answered;
+            
+            // Aggiorna la barra di avanzamento
+            const progress = (answered / questions.length) * 100;
+            document.getElementById('progress-bar').style.width = `${progress}%`;
+        }
+
+        // Correggi il test
+        function checkQuiz() {
+            const results = [];
+            let score = 0;
+            
+            questions.forEach((q, index) => {
+                const selectedOption = document.querySelector(`input[name="q${index}"]:checked`);
+                const selectedIndex = selectedOption ? parseInt(selectedOption.value) : -1;
+                const isCorrect = selectedIndex === q.correct;
+                
+                if (isCorrect) score++;
+                
+                results.push({
+                    question: q.question,
+                    selected: selectedIndex !== -1 ? q.options[selectedIndex] : "Nessuna risposta",
+                    correct: q.options[q.correct],
+                    isCorrect: isCorrect
+                });
+            });
+            
+            // Mostra i risultati
+            showResults(score, results);
+        }
+
+        // Mostra i risultati
+        function showResults(score, results) {
+            const scoreDisplay = document.getElementById('score');
+            const resultsDetails = document.getElementById('results-details');
+            
+            // Calcola la percentuale
+            const percentage = Math.round((score / questions.length) * 100);
+            
+            // Mostra il punteggio
+            scoreDisplay.textContent = `Punteggio: ${score}/${questions.length} (${percentage}%)`;
+            
+            // Mostra il dettaglio delle risposte
+            resultsDetails.innerHTML = '';
+            results.forEach((result, index) => {
+                const resultItem = document.createElement('div');
+                resultItem.className = `result-item ${result.isCorrect ? 'correct' : 'incorrect'}`;
+                resultItem.innerHTML = `
+                    <div class="result-status">${index + 1}</div>
+                    <div class="result-details">
+                        <div class="result-question">${result.question}</div>
+                        <div class="result-answer">
+                            <strong>La tua risposta:</strong> ${result.selected}<br>
+                            <strong>Risposta corretta:</strong> ${result.correct}
+                        </div>
+                    </div>
+                `;
+                resultsDetails.appendChild(resultItem);
+            });
+            
+            // Mostra la sezione risultati
+            document.getElementById('results').style.display = 'block';
+            
+            // Scrolla fino ai risultati
+            document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
+            
+            // Evidenzia i risultati
+            setTimeout(() => {
+                document.getElementById('results').classList.add('highlight');
+                setTimeout(() => {
+                    document.getElementById('results').classList.remove('highlight');
+                }, 1500);
+            }, 300);
+        }
+
+        // Reset del test
+        function resetQuiz() {
+            // Deseleziona tutte le risposte
+            document.querySelectorAll('input[type="radio"]').forEach(input => {
+                input.checked = false;
+            });
+            
+            // Rimuovi le selezioni visive
+            document.querySelectorAll('.option').forEach(option => {
+                option.classList.remove('selected');
+            });
+            
+            // Nascondi i risultati
+            document.getElementById('results').style.display = 'none';
+            
+            // Resetta la barra di avanzamento
+            document.getElementById('progress-bar').style.width = '0%';
+            
+            // Aggiorna i contatori
+            updateAnsweredCount();
+            
+            // Scrolla in cima alla pagina
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Inizializza il quiz quando la pagina è caricata
+        document.addEventListener('DOMContentLoaded', () => {
+            initQuiz();
+            
+            // Aggiungi event listener per il pulsante di correzione
+            document.getElementById('check-btn').addEventListener('click', checkQuiz);
+            
+            // Aggiungi event listener per il pulsante di reset
+            document.getElementById('reset-btn').addEventListener('click', resetQuiz);
+        });
+    </script>
+</body>
+</html>
