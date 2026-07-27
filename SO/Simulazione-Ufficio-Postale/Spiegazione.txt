@@ -1,0 +1,109 @@
+## DIRECTOR ##
+inizializzazione di oggetti IPC (aggiungere descrizione)
+Attenzione non mettere subito le ftok nell'inizializzazione delle IPC (dentro le get), perché se la chiave non si può creare allora bisogna gestire l'errore
+Attenzione bisogna aggiungere la reinizializzazione delle statistiche giornaliere (o lo si fa in director oppure negli altri processi), FARLA IN DIRECTOR QUELLE INIZIALI POI DAI GIORNI PROSSIMI IN POI LE SI FA NEI VARI PROCESSI
+Si usa la malloc per creare un'area di memoria dinamica in cui tenere traccia di tutti i pid dei vari processi (operatori e utenti) che si sono creati
+Si stampa 2 tipi diversi di statistiche: quelle per ogni giornata di ogni/tutti servizi, quelle totali di ogni/tutti servizi; inoltre controllare se mettere una funzione che risparmia quale servizio si va a scrivere (il ciclo for che va a prendere il nome del servizio)
+L'inizializzazione di struct come sigaction o sembuff serve per evitare problemi con campi non inizializzati (come evitare flags o mask indesiderati) -> meglio farlo con BZERO?
+SEGNALI: processi in background e come inviare il segnale se da un processo o da tutti; l'invio dei segnali del processo director agli altri processi (non che figli) per indicargli che è finita la giornata è che devono resettare il tutto -> tramite segnale di SIGALRM oppure SIGUSR1 (uso di killpg(0,SIGUSR1) oppure kill(-getpgrp(),SIGUSR1))
+Usato memoria condivisa e semafori per la gestione del tempo simulato mandato anche agli altri processi
+CONTROLLARE LA DISATTIVAZIONE DELLE QUEUE
+CONTROLLARE IL RATIO_OPERATOR_DESK PERCHE' GLI SPORTELLI POTREBBERO ESSERE VUOTI ANCHE SE C'ERA QUALCUNO LI
+
+## PARSER ##
+Il file parser permette di leggere tutti i parametri richiesti della simulazione dal file di configurazione 
+Si è deciso di creare un parser personalizzato con estensione .conf, altrimenti si può usare l'header "#include <libconfig.h>" per i file con estensione .ini (cioè testi con sezione)
+Apertura del file che contiene i parametri (se il file non c'è il programma aggiunge un default per i parametri)
+Si può mettere atoi e atof se non si vuole la gestione degli errori oppure Utilizzo di strtol e strtod per gestione di errore più dettagliata in caso di sintassi non corretta (convertire i valori dei parametri da stringa a long/double (downcast (cioè la conversione da long a int o da double a float con riduzione di capacità del tipo di contenere i valori)));
+
+## TICKET ##
+Il file ticket è l'erogatore ticket che si occupa di fornire gli utenti di ticket, che avranno di conseguenza il tempo che ci impiegano a completare il servizio un volta che l'utente è allo sportello (services provide == i erogazione dei servizi)
+Si attacca agli IPC che servono per questa operazione: (2 SHM (statistiche e parametri), 1 SEM (statistiche), 1 QUEUE (Erogatore-utente))
+La QUEUE per le richieste vale 1 e per le risposte è uguale al PID dell'utente (cosi l'utente specifico riceverà il proprio messaggio di risposta)
+Quando finisce la giornata o la simulazione l'erogatore ticket eseguirà l'ultima operazione (se ha già letto la richiesta da parte dell'utente nella queue) del ticket (che verrà successivamente scartato) e la invierà all'utente, deve rinizializzare la coda dei messaggi e le statistiche della giornata presente nella memoria condivisa (LE RICHIESTE NELLA QUEUE CHE L'EROGATORE DOVREBBE LEGGERE LE CONSIDERIAMO COME NON EROGATI OPPURE DA SCARTARE??)
+N.B. MANCA IL SETTAGGIO DEL SEMAFORO (ANDARE A CONTROLLARE)
+
+## OPERATOR ##
+Il processo operator permette di erogare uno dei servizi che gli è stato assegnato prima del "execl", in modo da poter erogare il servizio per l'utente che richiede quel determinato servizio.
+Si attacca agli IPC (4 SHM, 3 SEM)
+Controllare la gestione dei segnali nel caso si chiuda il processo con SIGINT mentre sta facendo il gestore degli altri segnali (se metto due volte la modifica nella memoria condivisa?)
+Uso di un flag (current_day) che permette di mettere il processo in attesa finché non inizia la giornata oppure quando finisce la giornata di rinizializzare le variabili
+Uso di SIGUSR2 per inviare un segnale a tutti i processi che sono in attesa di uno sportello libero, ma senza aver bisogno di un gestore esplicito del segnale. Si usa sigprocmask per bloccare SIGUSR2 quando l'operatore non è in attesa, in modo che non invia il segnale a tutti i processi ma solo a quelli che sono in attesa
+
+## USER ## 
+Prima di iniziare la simulazione, ogni utente ha bisogno di un valore di probabilità (tra P SERV MIN e P SERV MAX) che permetterà ad egli di decidere se recarsi alle poste o meno, chiamata P SERV
+Se la decisione dell'utente è minore del valore P_SERV allora significa che va alle poste; successivamente sceglie il servizio che vuole usufruire (NEL CASO QUESTO PARAMETRO DIVENTERA' UN ARRAY)
+Per motivi di efficienza e comunicazione tra i processi (troppi semafoi e queue??), si è deciso di far in modo che sia il processo utente a occupare lo sportello per gestire il servizio da lui richiesto
+L'utente cerca controlla se lo sportello è libero (CAMBIARE LA MEMORIA CONDIVISA DEL DESK (IN MODO DA LASCIARE IL ENUM DELLO SPORTELLO OCCUPATO DA UN ALTRO UTENTE)) se è libero lo occupa lui altrimenti finisce nella coda di attesa (controllare anche il processo operatore che deve cambiare alcune impostazioni (vedi la riga 88, ma potrebbe andare bene questa disposizione se effetivamente il semaforo viene occupato dall'utente quando si trova allo sportello per l'erogazione del suo servizio)
+FINIRE LA LIBERAZIONE DELLA QUEUE A FINE GIORNATA E FINIRE LE MASK PER BLOCCARE I SEGNALI
+
+## IPC Objects
+Per l'inizializzazione degli IPC si può fare in due modi, con la funzione ftok che crea una chiave a partire da un file oppure si inserisce manualmente una chiave a mia scelta (per il progetto ho optato ftok con l'uso di proj_id di valori scelti dal programmatore (cioè me))
+Scegliere quante e per quale utilizzo servono
+Shared memory: una per le statistiche (quelle stampate per ogni giorno), una per gli sportelli, una per i parametri della simulazione (letti dal parser); POSSIBILE OPZIONE (PER GESTIONE DEL TRASCORRERE DEL TEMPO) 1 memoria condivisa che contiene il trascorrere del tempo (simulato) che verrà letto dai processi utenti e operatori (IN QUESTO CASO SI AGGIUNGE ANCHE UN SEMAFORO PER EVITARE L'ACCESSO SIMULTANEO SULLA MEMORIA CONDIVISA)
+Semaphores: una per le statistiche, una per ogni sportelli presenti nella memoria condivisa (PER GLI SPORTELLI SI E' DECISO DI FARE UN SEMAFORO PER OGNUNO DI QUESTI (per massimizzare il grado di concorrenza),  ALTRIMENTI UN SOLO SEMAFORO CHE GESTISCA LA MEMORIA CONDIVISA DEKS??)
+Queue: 1 coda di messaggi che permette all'erogatore di fornire un ticket all'utente (usando mtype per l'invio e ricezione in entrrambi i processi (erogatore, ticket)) e un'altra coda (per ogni sportello) che gestisce il numero di utenti in attesa; POSSIBILE OPZIONE (PER GESTIONE DEL TRASCORRERE DEL TEMPO) 2 code queue che permettono di inviare il tempo trascorso dal processo direttore ai processi utenti (con i suoi orari stabiliti) e ai processi operatori (orari di inizio turno)
+
+MODIFICHE DA FARE -> CAMBIARE IL TIPO DEL TEMPO MEDIO NELLA STRUCT DEI PARAMETRI (E ANCHE NEGLI ALTRI FILE); DA FLOAT A INT (PERCHE' IL TEMPO MEDIO VIENE GIA' CONTATO COME NORMALE SENZA DOVER FARE LA DIFFERENZA)
+
+
+## Directory "Headers"
+Contiene tutti i file header, in cui ognuno di questi farà un compito ben preciso, alla fine saranno collegati tra di loro nel file common
+ 
+## common.h
+header che contiene tutte le funzionalità comuni (all'interno del progetto) collegando i vari file della directory headers
+
+## libraries.h 
+file header che contiene le librerie per l'intero progetto (condivide tutte le inclusioni (#include))
+
+## constants.h
+file header che contiene le costanti per l'intero progetto (condivide le #define)
+
+## types.h
+file header che contiene le strutture dell'intero progetto (condivide tutte le struct)
+
+
+## SEM e MSG  ##
+Utilizzo di file chiamati sem.c e msg.c che permettono di fare le operazioni sui semafori e code di messaggi senza aver bisogno di ripeterle ogni volta, uso del protocollo dei semafori binari
+
+IDEE PER IL PROGETTO:
+1) Aggiungere un file o una funzione che gestisce gli errori (come ad esempio delle inizializzazione di IPC andate male oppure problemi con i segnali) -> aggiungere condizione di error con errno dopo ogni chiamata IPC
+2) Sincronizzazione dei vari processi con le giornate e lo scorrere del tempo
+	Il direttore avvia la simulazione, inizializzando giorno = 1, minuto = 0.
+	Il direttore avanza il tempo minuto per minuto (nanosleep(N_NANOSECS)).
+	Gli utenti e gli operatori aspettano un semaforo prima di iniziare la giornata.
+	Alla fine della giornata, il direttore manda un segnale (SIGUSR1) agli altri processi e aspetta qualche secondo.
+	Gli utenti e operatori ricevono il segnale e lo gestiscono con una funzione (gestisci_segnale).
+	Gli utenti entrano in attesa della nuova giornata. 
+	Il direttore avanza il giorno e invia un altro SIGUSR1 per iniziare il nuovo giorno.
+	Gli utenti e gli operatori ripartono con il nuovo giorno.
+	Gli utenti e gli operatori riprendono il lavoro fino al prossimo segnale.
+IDEA ALTERNATIVA USARE UN SEMAFORO CHE BLOCCA I PROCESSI IN ATTESA DEL INIZIO DELLA GIORNATA E LI BLOCCA ALLA FINE DI UNA GIORNATA
+3) Uso di sigprocmask per bloccare/sbloccare/impostare una maschera di segnali, in modo da evitare che i segnali interferiscano con sezioni critiche 
+Uso di sblocco della maschera con SIG_UNBLOCK invece che con SIG_SETMASK, perché tanto non ci sono altri segnali che erano bloccati già prima (ogni processo ha la propria maschera di segnali, per cui non c'è pericolo di concorrenza con gli altri processi)
+SE VUOI FAI IL CONTRARIO (A TE LA SCELTA)
+4) Usare un altro metodo di sincronizzazione insieme al inizio e fine giornata? Tipo quando apre l'ufficio? NEL CASO POTREBBE ESSERE INUTILE QUESTA PARTE
+
+
+RICORDA:
+TEST_ERROR DI EDU SI TROVA NEL FILE SEM.C
+
+
+Tempo di Attesa degli Utenti
+Indica quanto tempo un utente deve aspettare dal momento in cui prende il ticket fino a quando inizia il servizio.
+Dipende dalla disponibilità degli sportelli e dagli operatori presenti.
+Aumenta se ci sono troppi utenti rispetto agli sportelli disponibili o se gli operatori fanno pause.
+
+Tempo di Erogazione dei Servizi
+Indica il tempo impiegato per completare il servizio una volta che l'utente è allo sportello.
+Varia in base al servizio richiesto (ad esempio, "Invio pacchi" richiede più tempo di un "Prelievo bancoposta").
+È calcolato casualmente con una variazione del ±50% rispetto al valore medio specificato nella tabella.
+
+In sintesi:
+Il tempo di attesa misura il ritardo prima di ricevere il servizio.
+Il tempo di erogazione misura la durata del servizio stesso.
+
+Aggiunto al makefile -Wno-unused-parameter perché ci sono alcuni parametri che non vengono utilizzati ma che per via del flag non compila il codice come i signal handler con signum
+
+
+Mettere dei printf per vedere il flusso di corrente del codice
