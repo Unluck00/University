@@ -1,0 +1,122 @@
+Ricavare i pazienti che sono anche medici (cioè hanno gli
+stessi nome, cognome e residenza).
+A := πNome,Cognome,Residenza(MEDICI)
+B := πNome,Cognome,Residenza(PAZIENTI)
+A∩B
+
+
+Ricavare il nome e il cognome del paziente più anziano.
+Quindi si estrae la data più minima (negazione essenziale)
+Metodo utilizzo prodotto cartesiano (altrimenti con join)
+
+U := insieme di tutti gli anni di nascita dei pazienti (Universo)
+U := ρData1 <- AnnoNascita(πAnnoNascita(PAZIENTI)) 
+
+P := valori (Anni di nascita) che sono maggiori di almeno un valore (Anno di nascita)
+P := πData1(σData1>Data2(UxρData2 <- AnnoNascita(πAnnoNascita(PAZIENTI))))
+
+A := elenco degli anni di nascita che hanno valori minori o uguali a tutti gli altri (anno che non è maggiore di nessuno)
+A := U - P  
+
+R := selezionare solo il nome e cognome dei pazienti che hanno l'anno di nascita minimo
+R := πNome,Cognome(σAnnoNascita=A(PAZIENTIxA)) oppure
+πNome,Cognome(σPAZIENTI.AnnoNascita=A.AnnoNascita (PAZIENTI×A))
+
+
+
+
+Ricavare il nome e il cognome dei medici che hanno curato
+almeno due pazienti nati prima del 1960.
+(negazione essenziale, self join)
+
+P60 := pazienti nati prima del 1960
+P60 := σAnnoNascita<1960(PAZIENTI)
+
+PM := pazienti nati prima del 1960 con i dati dei medici che li curano
+PM := πPrimario,PAZ(P60 ⋈P60.COD=RICOVERI.PAZ RICOVERI ⋈RICOVERi.Reparto=REPARTI.COD REPARTI)
+
+M := medici che curano almeno due pazienti diversi nati prima del
+1960
+M := ρPrim1,Paz1 <- Primario,PAZ(PM) ⋈ Prim1=Prim2∩Paz1≠Paz2 ρPrim2,Paz2 <- Primario,PAZ(PM)
+
+R := dati dei medici in M
+R := πPrim1(M)
+
+
+
+Elencare i pazienti che sono stati curati da ogni medico
+(quantificazione universale, operatore quoziente)
+
+r(PAZ,MATR) := coppie pazienti (A) e medici (B) che li curano
+r(PAZ,MATR) := πPAZ,MATR(RICOVERI ⋈RICOVERI.Reparto=MEDICI.Reparto MEDICI)
+
+s(MATR) := tutti i medici
+s(MATR) := πMATR(MEDICI)
+
+R := pazienti in r(PAZ,MATR) che sono accoppiati con ogni medico in
+s(MATR)
+R := r(PAZ,MATR) ÷ s(MATR)
+
+
+
+Elencare i medici che hanno curato tutti i pazienti ricoverati
+
+r(MATR,PAZ) := coppie medici (A) e pazienti (B) che hanno curato
+r(MATR,PAZ) := πMATR,PAZ(MEDICI ⋈MEDICI.Reparto=RICOVERI.Reparto RICOVERI)
+
+s(PAZ) := tutti i pazienti ricoverati
+s(PAZ) := πPAZ(RICOVERI)
+
+R := medici in r(MATR,PAZ) che sono accoppiati con ogni paziente in
+s(PAZ)
+R := r(MATR,PAZ) ÷ s(PAZ)
+
+
+
+Elencare gli studenti che hanno superato tutti gli esami
+del loro indirizzo
+(non si usa l'operatore quoziente essendo che l'universo di confronto non è uguale per tutti (per ogni singolo studente si può avere un indirizzo diverso))
+
+U := tutti gli studenti
+U := πMATR(S)
+
+P := studenti che non hanno superato qualche esame del loro indirizzo (studenti associati ai corsi in base al loro indirizzo meno gli esami che hanno svolto (E))
+
+I := ogni studente associato agli esami del suo indirizzo
+I := πMATR,Corso,Indirizzo(S ⋈S.Indirizzo=O.Indirizzo O)
+
+P := I - E
+
+R := soluzione
+R := U - P 
+
+
+
+Elencare i nomi dei piloti che non hanno partecipato a
+gare nelle nazioni in cui si sono disputati almeno due
+gran premi 
+
+G := nazioni in cui si sono svolte almeno due gran premi
+G := ρNaz1 <- Nazione (GRANPREMIO) ⋈Naz1≠Naz2 ρNaz2 <- Nazione (GRANPREMIO)
+
+PG := piloti che hanno partecipato alle gare nelle nazioni di G
+PG := GRANPREMIO ⋈GRANPREMIO.Nazione=PIAZZAMENTO.Nazione PIAZZAMENTO ⋈Pilota=Nome PILOTA 
+
+P := nomi dei piloti che non sono in PG
+p := πNome(PILOTA) - πNome(PG)
+
+
+
+Ricavare numero e data di inizio della legislatura che ha avuto il/la presidente del consiglio tra i cui incarichi è presente l’incarico più lungo di tutti
+
+I := l'incarico più lungo di tutti (durata massima)
+I := ρI1 <- INCARICO(INCARICO) - πI1.*(ρI2 <- INCARICO(INCARICO) ⋈I1.Durata≠I2.Durata ρI2 <- INCARICO(INCARICO))
+
+LI := legislatura avuta dal presidente tra gli incarichi si ha I
+LI := LEGISLATURA ⋈Numero=NumeroL (I) oppure DG
+
+R := numero e data della legislatura
+R := πNumero,DataInizio(LI)
+
+POSSIBILE AGGIUNTA: DataGiuramento non è un valore NULL
+DG : σDataGiuramento IS NOT NULL (I)
