@@ -1,0 +1,31 @@
+Leggenda:
+"Q" è l'insieme finito di nodi
+"q_init e q_fin ∈ Q" sono rispettivamente il nodo iniziale e finale
+"Act" è l'insieme delle azioni
+"α1,..,αn ∈ Act*" è l'insieme infinito/finito di azioni (non ripetute) che possono essere anche non eseguite
+""<q,α,q'> ∈ E"" sono gli archi che costituiscono un collegamento tra due nodi e l'azione corrisposta
+"σ ∈ Mem" costituisce l'insieme degli stati della memoria che vengono rappresentati da 'σ'
+"Mem = Var -> Z" la memoria è data da una variabile e dal suo corrispettivo elemento; concetto di memoria concreta
+"(^σ1,^σ2) ∈ ^Mem = (Var -> Sign) x (Array -> P(Sign))" sostituendo i valori con delle proprietà per l'analisi; concetto di memoria astratta
+"<q,σ> ∈ QxMem" rappresenta la coppia di una configurazione
+"<q,σ> =>α <q',σ'>" rappresenta un passo di esecuzione (o transizione)
+"ω" permette di rappresentare una sequenza di passi di esecuzione (ω=α1,..,αn)
+"c ∈ C" rappresenta i Commands semplici
+"GC" rappresenta i Commands con le guardie (più scelte)
+"edges(q_init~>q_fin)(C)" permette di associare il PG ai GC, definendo l'insieme dei archi di un PG tra il nodo iniziale e quello finale 
+"(c,σ) ->ω (c',σ')" rappresenta una configurazione (associando la semantica ai GC) effetuata attraverso una serie di azioni 'ω'
+"φ" rappresenta il predicato
+"e" rappresenta l'espressione
+"_σ_" è un'interpretazione delle variabili logiche del programma 
+"E[e](σ,_σ_)" rappresenta la funzione di valutazione che calcola il valore semantico (il numero intero risultante) dell'espressione (e) sotto gli assegnamenti correnti.
+"(σ,_σ_) |= φ" permette di affermare che il predicato è soddisfacibile 
+"P: Q -> Pred" è una map che rappresenta il predicate assignment 
+"(σ,_σ_) |= P(q_iniz) ∧ S[α]σ = σ' => (σ',_σ_) |= P(q_fin)" rappresenta la correttezza del predicato, in cui se per ogni arco dell'insieme `E`, la soddisfacibilità del predicato nello stato iniziale `q_iniz` con memoria `σ` e la sua semantica implicano la validità nello stato finale (o successivo) `q_fin` con memoria modificata `σ'`
+"AP" rappresenta il programma annotato 
+"P1[P2](q)" P1 e P2 sono due partial predicate assignment per PG e l'operazione combina i due assegnamenti (dando priorità a P2 (sovrascrittura)) 
+"(E1,P1) ⊕ (E2,P2) = (E1∪E2, P1[P2])" fonde l'insieme delle due coppie di archi e predicati
+"η: Mem -> ^Mem con η(σ)=(^σ1,^σ2)" rappresenta la funzione di estrazione che permette di passare dalla memoria concreta a quella astratta
+"A: Q -> P(^Mem)" è una map che associa ad ogni nodo il concetto della memoria astratta
+
+"⊢(c,σ) => τ" stabilisce che l'esecuzione è valida perché esiste almento una derivazione `D` che la supporta
+"⊥" che rappresenta un valore non definito o la non-terminazione del programma, è una funzione parziale in cui non tutti gli elementi di partenza (del dominio) hanno un risultato valido (sistema non è definito per tutti gli elementi del dominio)
