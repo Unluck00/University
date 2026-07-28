@@ -1,0 +1,48 @@
+protocolli (di rete) IP e ICMP
+
+CIDR (determina i bit del indirizzo definito nella rete)
+
+FINO A SLIDE 47
+
+ATTENZIONE SEGUENTE PARTE CON CHATGPT:
+	Numero indirizzi in un blocco /p = 2^(32-p). Numero host utilizzabili (classico IPv4) = 2^(32-p) - 2 	(network + broadcast esclusi), salvo eccezioni /31 e /32.	
+	Nel prefisso CIDR a.b.c.d/p:
+		p = numero di bit della rete
+		i restanti (32 - p) bit = bit dell'host
+	solo i bit host possono cambiare
+	i bit rete NON contribuiscono agli host
+Quindi \p sono i bit della parte di rete (fissi) mentre i 32-p sono i bit della parte host
+quindi in una sottorete si ha che \p sono i bit usati in quella rete (fissi), quindi ad esempio 192.168.1.0/24 identifica che 192.168.1 è il prefisso di rete, e l'ultimo byte (x) rappresenta gli host da 0 a 255
+Puoi pensarla così:
+	/24 = i primi 3 ottetti sono rete
+	l’ultimo ottetto è host
+	RETE.RETE.RETE.HOST
+	192.168.1.HOST
+
+
+ifconfig: fa vedere le configurazioni delle interfacce di rete
+route -n: fa vedere la tabella di routing della propria macchina
+netmask: altra forma di rappresentare la sottorete (subnet) es. 255.0.0.0 (sottorete che è \8; i primi 8 bit identificano la sottorete (host)); quindi la rete ad esempio 127.0.0.1\8 e dato da quella netmask
+
+Slide 52-58: assegnare l'indirizzo della macchina (manuale (ma se si mette a caso non funziona niente, ed è possibile che ci siano due macchine nella sottorete con lo stesso indirizzo -> router si confonde), DHCP servizio di distribuzione degli indirizzi)
+Protocollo DHCP: la macchina che si collega la prima volta ad una rete (non ha indirizzo e router deve mandare indirizzo alla macchina), uso di meccanismo di broadcast per trovare il server DHCP della rete (manda anche alle altre macchina della stessa sottorete, ma a loro non interessa) il server DHCP risponde a sua volta con un altro broadcast per mandare l'indirizzo alla macchina che ha fatto il broadcast (manda anche alle altre macchina della stessa sottorete, ma a loro non interessa) e infine ci sarò la richiesta e l'ack per confermare l'indirizzo (tra client e server)
+Obiettivo DHCP: Distribuire gli indirizzi IP, gateway, maschera (barra della sottorete), DNS 
+Ogni volta che una macchina ha l'indirizzo IP della rete e se va, ridà l'IP alla rete in modo che venga ad un'altra macchina
+Porte del DHCP 68 e 67
+Due server DHCP nella sottorete crea un casino (due risposte due indirizzi)
+
+Slide 59-63: Per ottenere un indirizzo IP, qualcuno definisce a chi appartiene il blocco e lo divide in parti più piccoli (più organizzazioni)
+Hierarchical addressing: permette di decidere in quale router essere aggregato e sarà un estensione della sua rete
+
+Slide 65-66: NAT (Network Address Translation) è un traduttore di indirizzi, tale che permette di connettere la rete privata con quella pubblica (permettendo cosi di inviare pacchetti in altre reti con IP privati)
+reti private sono 3: 10/8, 172.16/12, 192.168/16
+
+slide 67-68: Il router (col traduttore NAT) sostituisce l'indirizzo del IP privato e il numero di porta con il proprio indirizzo IP NAT e un nuovo numero di porta; quindi ogni coppia di traduzione (IP/porta di origine a IP/porta NAT) viene memorizzata nella tabella di traduzione (nel router); quando il datagram entra nel router (per via della risposta ricevuta) allora utilizza la tabella per sostituire l'indirizzo IP di destinazione e il numero di porta (l'indirizzo NAT) con l'indirizzo IP e la porta interni privati
+Non si può fare il contrario (in cui qualcuno dall'esterno della rete vuole palare con la macchina interna privata), si fa con varie forme come UIMP, ecc.. che si mettono d'accordo su quale porta mettersi??
+
+slide 70-72: IPv6 è stato sviluppato per estendere gli indirizzi IP (IPv4 ha solo 32 bit, esaurimento di spazio) e elaborazioni più rapide grazie ad un header più grande; 
+IPv6 ha 128 bit con caratteri esadecimali e i ":" sono la separazione dei gruppi  
+IPv6 non fa frammentazioni (rispetto al IPv4) non si vuole il lavoro di smontare il pacchetto in pezzettini per passare nelle strade strette e rimetteva poi tutti insieme; con IPv6 manda direttamente errore (toglie complessità della rete)
+Stesso formato di IPv6 ma senza opzioni (semplificare il lavoro dei router, protocollo più semplice)
+Una macchina IPv6 non riesce direttamente a comunicare con un'altra macchina IPv4, quindi o c'è il passaggio o traduzione di indirizzi --> detto tunneling (protocollo sopra l'altro; connessione virtuale tra le due reti, lo legge come IPv4) ma dentro c'è IPv6 (come protocollo), quindi avviene una traduzione di indirizzi) 
+

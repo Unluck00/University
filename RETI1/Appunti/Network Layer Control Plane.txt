@@ -1,0 +1,43 @@
+slide 10: si deve capire il miglior percorso per instradare i pacchetti, in cui il router dovrebbe sapere dove scrivere i pacchetti 
+i costi si riferiscono al costo di un collegamento diretto (link cost) che connette due nodi (router) in un grafo di rete; si possono usare degli algoritmi per ridurre il costo del percorso scelto (come Dijkstra o Prim) sottoforma di numeri di hop
+Ogni router calcola i percorsi minimi per arrivare in tutte le altre destinazioni, quindi deve avere informazioni di tutti i percorsi per riempire la sua tabella forwarding 
+
+slide 62: Ogni router è fatto con livelli, dove i livelli sono determinati dai Autonomous System (AS)
+Un Autonomous System (AS) è un gruppo di reti e router gestiti da un'unica entità, come un ISP o un'azienda, che segue una politica di routing comune; quindi ogni router all'interno di un AS devono capire come inoltrare i pacchetti nella rete; quando si passa da un AS (da una rete) ad un altro (rete) si fa un "inter-AS routing"; in una stessa AS usa una firma di autorizzazione (sicurezza) (con un algoritmo come di Dijkstra), mentre invece tra di più AS costa di più (uso di un altro algoritmo)
+
+slide 11: Se si controlla tutto si possono usare algoritmi globale (link state) altrimenti uso algoritmo centralizzato (distance vector) (rete troppo grossa) (come passaggio tra i AS)
+
+slide 12-15: Uso di link state per algoritmo globale
+L'algoritmo di Dijkstra è greedy trova il cammino minimo da un nodo sorgente a tutti gli altri nodi in un grafo con pesi non negativi. Esso funziona scegliendo ripetutamente il nodo non visitato più vicino alla sorgente, garantendo che, ad ogni passo, si sia determinata la distanza minima definitiva per il nodo selezionato
+
+slide 27-30: Si scrive la tabella forwarding che dice i vari costi di percorso tra i vati nodi (router) rispetto al nodo originale (il router in cui si scrive la tabella), in pratica sarà più complesso con le oscillazioni (carico dei link, quindi traffico in un'unica direzione)
+Il router passa le informazioni su se stesso, non sugli altri; quindi i costi di percorso
+
+slide 31-35: Uso di distance vector per algoritmo centralizzato
+Non si può fare che l'informazione sia disponibile su tutti i router (scala globale), quindi ci serve qualcosa che sia utilizzabile a livello globale (usabile in inter-AS)
+L'algoritmo di distance vector, si basa sull'equazione di Bellman-Ford; utilizza la programmazione dinamica per trovare il percorso a costo minimo; definisce il costo del percorso a costo minimo dal nodo x al nodo y come Dx(y); La formula chiave è Dx(y)=min_v{c_x,v + Dv(y)}, dove il minimo è calcolato su tutti i vicini v di x. c_{x,v} rappresenta il costo diretto del collegamento da x a v, e Dv(y) è il costo stimato del percorso a costo minimo da v a y. Ogni nodo scambia periodicamente le proprie stime dei costi del percorso a costo minimo con i nodi vicini
+
+slide 36-46: mostra un esempio di come funziona l'algoritmo di distance vector tra dei router
+Il distance vector non basta come algoritmo per il routing, verrà usata un'altra forma chiamata Border Gateway Protocol (BGP) che è un protocollo "path vector" (vettore dei percorsi) che pubblicizza percorsi verso diversi prefissi di rete di destinazione.
+
+slide 46-47: l'algoritmo di DV dà uno svantaggio cioè che i costi cambiano nel tempo (oscillano) e quindi si ha il problema che si manca la memoria di chi era il prossimo hop (dovuto ad un cambio di costo) e porta ad un incremento dei costi vicini senza senso (problema del count-to-infinity)
+
+slide 50-53: approccio per rendere il routing scalabile suddividendo la rete in sistemi autonomi (AS) per gestire la scala e l'autonomia amministrativa. Il routing idealizzato non è pratico a causa della scala (miliardi di destinazioni) e della necessità di autonomia amministrativa. Il routing intra-AS avviene all'interno di un AS, mentre il routing inter-AS avviene tra diversi AS (in cui al confine sono situati i router gateway). 
+Le tabelle di forwarding sono configurate da algoritmi di routing intra e inter-AS. Il routing inter-AS e intra-AS determinano le voci per le destinazioni esterne
+
+slide 58-63: il routing tra diversi AS non è solo basato su l'algoritmo path-vector ma anche su relazione client provider (clienti che forniscono la rete), se BGP è configurato male si crea problemi in tutta la rete; Il protocollo BGP permette a una sottorete di annunciare la propria esistenza e le destinazioni raggiungibili al resto della rete, ottenere informazioni sulla raggiungibilità delle destinazioni dai vicini (eBGP) e di propagarle internamente (iBGP).
+Una sessione BGP è una connessione TCP semi-permanente tra due router ("peer"), i messaggi scambiati includono OPEN, UPDATE, KEEPALIVE e NOTIFICATION; 
+Un percorso BGP pubblicizzato consiste in un prefisso (destinazione) e attributi.
+Due attributi importanti sono AS-PATH (lista di AS attraversati) e NEXT-HOP (router interno-AS successivo).
+Il routing basato su policy permette ai gateway di accettare o rifiutare percorsi in base a specifiche regole di importazione con esempi sulle slide 64-65-66-67
+
+slide 68: Hop potato routing è una tecnica utilizzata nel BGP in cui un AS cerca di uscire dal proprio dominio il più rapidamente possibile, minimizzando il costo intra-dominio (costo interno) piuttosto che il costo inter-dominio (costo esterno); anche se dovesse contare più salti rispetto all'altro percorso
+
+slide 69-70: Il BGP utilizza gli annunci di percorso per implementare le politiche di instradamento nel mondo reale; Un ISP (Provider Network) desidera instradare il traffico solo verso i propri clienti o dai propri clienti verso il mondo esterno, non vuole fungere da transito per il traffico tra altri ISP
+
+slide 71: Transizione in base alla congestione nelle policy, andare avanti un annuncio si prende in considerazione le policy, shortest-path, percorso più economico ecc..
+
+slide 74-75: Il protocollo Internet Control Message Protocol (ICMP) è utilizzato da host e router per comunicare informazioni a livello di rete, viene usato nel comando Traceroute, I messaggi ICMP sono trasportati all'interno di datagrammi IP.
+Traceroute invia segmenti UDP con valori TTL crescenti per scoprire i router lungo il percorso
+Il router scarta il datagramma e invia un messaggio ICMP (tipo 11, codice 0) quando il TTL scade
+I messaggi invitati alla rete possono essere segnalazione errori: host, rete, porta, protocollo irraggiungibili; richiesta/risposta echo (usata da ping)

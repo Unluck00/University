@@ -1,0 +1,46 @@
+slide 3-4: Il Link Layer si occupa del trasferimento di frame ethernet (unità di dati (incapsula il datagramma) trasmessi su Link Layer) usando diversi protocolli diversi come WiFi ed Ethernet, il trasferimento avviene da un nodo all'altro fisicamente adiacente. 
+Il trasferimento del pacchetto datagramma avviene da diversi protocolli di link ad altri, es. WiFi sul primo link, Ethernet sul link successivo; ognuno dei protocolli di link fornisce servizi diversi (es. può o non può fornire un trasferimento dati affidabile sul link)
+
+Slide 5-6: I servizi offerti sono: 
+	- framing, link access: incapsulamento dei datagrammi in frame (con aggiunta del header contenente gli indirizzi MAC (Multiple Access Control), in cui identificano la sorgente e la destinazione (diversi dagli indirizzi IP) indirizzo per collegamento al prossimo proxy) e controllo dell'accesso al mezzo condiviso
+	- consegna affidabile: garantisce l'invio corretto tra nodi adiacenti, principalmente usata sui canali con tasso di errore alto (wireless), in cui droppa il pacchetto o avvisa chi ha mandato il pacchetto che è sbagliato
+	- flow control: per controllare il flusso in un canale
+	- rilevamento errori: causati da attenuazione del segnale, rumore; oppure il ricevitore rileva e poi segnala la trasmissione o scarta il frame
+	- correzione errori: ricevitore identifica e corregge gli errori di bit senza ritrasmettere
+	- half-duplex e full-duplex: il full-duplex consente la trasmissione simultanea di dati in entrambe le direzioni, mentre l'half-duplex permette la comunicazione solo in una direzione alla volta. Un esempio di half-duplex sono i walkie-talkie, in cui si parla e poi si ascolta, mentre le telefonate sono un esempio di full-duplex, dove si può parlare e ascoltare contemporaneamente
+
+Slide 7-8: Implementazione del Link Layer al host viene tipicamente fatto su chip o in una scheda di rete (NIC), si collega ai bus di sistema dell'host
+La comunicazione tra interfacce 
+
+slide 10: 
+bit di parità- tramite controllo di bit di parità o disparità in base alla somma, si vede quello con errore (quello modificato)
+
+slide 11: 
+checksum con un meccanismo Cyclic Redundancy Check (CRC) 
+
+slide 14-16: 
+Multiple Access Protocols, diversi dispositivi su un canale si hanno le collisioni (mandare frame nello stesso momento)
+
+slide 17-19: suddivisione dei canali (per qualche millisecondo) 
+
+Slotted ALOHA probabilità che i dispositivi non usano il canale perché hanno una probabilità di andarci dopo una collisione (spreco di quantità di resource delle collisioni) operazione di backoff
+
+slide 23-30: CSMA (carrier sense multiple access) prima di mandare qualcosa si controlla se c'è qualcuno che trasmette (sente cosa c'è nella frequenza) se c'è qualcosa aspetta; con CSMA/CD con collision detection mentre trasmette continua a sentire se c'è un altro segnale che sta trasmettendo nello stesso momento allora o si ferma o continua a trasmettere; 
+Ethernet usa CSMA/CD, quindi verifica se la trasmissione è libero (idle) in caso contrario rimane in ascolto fino a quando il canale non è libero (busy); se mentre manda la trasmissione e avviene un collision detection manda un jam signal sulla rete (cioè andata male) e si ferma aspettando un tempo casuale (exponential backoff con 512 bit times (quindi ogni volta che si causa una collisione allora si aumenta backoff interval)) 
+"Taking turns" passare un token (accesso per la trasmissione per un piccolo periodo di tempo) uno alla volta con controllo, oppure una architettura a spirale che si passano (i nodi) il token finché non trova quello che deve trasmettere (lo usa il Bluetooth)
+
+slide 32-34: Indirizzo IP: Un indirizzo a livello di rete (livello 3) di 32 bit, utilizzato per l'inoltro a livello di rete.
+Indirizzo MAC: Un indirizzo fisico (livello 2) di 48 bit, utilizzato localmente per trasferire frame tra interfacce fisicamente connesse (trasmissione nella stessa sottorete); Mac Address è portable si può portare da una rete ad un altra
+
+slide 35-44: Protocollo ARP: mandare un frame si deve sapere il MAC address ed ogni singola macchina nella rete locale avrà una tabella ARP che fa l'associazione del MAC address all'IP address
+Mandare un pacchetto ad un PC all'esterno bisogna usare i protocollo IP (destinazione e sorgente), deve imparare il MAC address del router (che identificano il prossimo hop) e lo manda a lui e poi da lui lo rimanda dal pc esterno
+
+slide 46: Ethernet è la principale tecnologia di rete locale (LAN) cablata. Serve a trasferire frame tra nodi collegati sulla stessa rete locale. rilevazione degli errori (CRC) e se il CRC fallisce, il frame viene scartato.
+Connectionless: nessuna connessione preliminare tra mittente e destinatario.
+Non affidabile: il ricevente non invia ACK o NAK; i frame persi vengono recuperati solo da livelli superiori (es. TCP)
+Best effort: Ethernet tenta di consegnare i frame, ma non lo garantisce.
+
+Ethernet con switch: Ogni link è un collision domain separato.
+impara le associazioni MAC → porta
+inoltra i frame solo sulla porta corretta
+usa flooding (manda a tutti i PC locali il frame ricevuto) solo se il MAC è sconosciuto (l'unica macchina risponderà e permette di conoscere il path giusto, lo si usa solo nei locali)
