@@ -1,0 +1,90 @@
+<diagram program="umletino" version="15.1"><zoom_level>13</zoom_level><element><id>UMLActor</id><coordinates><x>169</x><y>195</y><w>78</w><h>143</h></coordinates><panel_attributes>Chef</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>754</x><y>273</y><w>39</w><h>1430</h></coordinates><panel_attributes>lt=.</panel_attributes><additional_attributes>10;10;10;1080</additional_attributes></element><element><id>Relation</id><coordinates><x>208</x><y>351</y><w>585</w><h>52</h></coordinates><panel_attributes>lt=&lt;&lt;&lt;-
+1.predisponiMenu(titolo?)
+fg=black</panel_attributes><additional_attributes>430;20;10;20</additional_attributes></element><element><id>Relation</id><coordinates><x>208</x><y>390</y><w>585</w><h>52</h></coordinates><panel_attributes>lt=&lt;.
+menù registrato
+fg=black</panel_attributes><additional_attributes>10;20;430;20</additional_attributes></element><element><id>UMLFrame</id><coordinates><x>104</x><y>819</y><w>715</w><h>754</h></coordinates><panel_attributes>LOOP
+layer=-1
+fg=gray</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>208</x><y>871</y><w>585</w><h>52</h></coordinates><panel_attributes>lt=&lt;&lt;&lt;-
+2.definisciSezione(nome)
+fg=gray</panel_attributes><additional_attributes>430;20;10;20</additional_attributes></element><element><id>Relation</id><coordinates><x>208</x><y>1092</y><w>585</w><h>52</h></coordinates><panel_attributes>lt=&lt;&lt;&lt;-
+4.consultaRicettario()
+fg=gray</panel_attributes><additional_attributes>430;20;10;20</additional_attributes></element><element><id>Relation</id><coordinates><x>208</x><y>1144</y><w>585</w><h>52</h></coordinates><panel_attributes>lt=&lt;.
+ricette 
+fg=gray</panel_attributes><additional_attributes>10;20;430;20</additional_attributes></element><element><id>UMLFrame</id><coordinates><x>143</x><y>858</y><w>663</w><h>104</h></coordinates><panel_attributes>LOOP
+fg=gray</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>208</x><y>1209</y><w>585</w><h>52</h></coordinates><panel_attributes>lt=&lt;&lt;&lt;-
+5.inserisciVoce(ricetta,sezione?,descrizione?)
+fg=gray</panel_attributes><additional_attributes>430;20;10;20</additional_attributes></element><element><id>Relation</id><coordinates><x>208</x><y>1248</y><w>585</w><h>52</h></coordinates><panel_attributes>lt=&lt;.
+voce registrata
+fg=gray</panel_attributes><additional_attributes>10;20;430;20</additional_attributes></element><element><id>Relation</id><coordinates><x>208</x><y>910</y><w>585</w><h>52</h></coordinates><panel_attributes>lt=&lt;.
+sezione registrata
+fg=gray</panel_attributes><additional_attributes>10;20;430;20</additional_attributes></element><element><id>UMLFrame</id><coordinates><x>143</x><y>1196</y><w>650</w><h>104</h></coordinates><panel_attributes>LOOP
+fg=gray</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>208</x><y>1573</y><w>585</w><h>52</h></coordinates><panel_attributes>lt=&lt;&lt;&lt;-
+8.pubblica()
+fg=gray</panel_attributes><additional_attributes>430;20;10;20</additional_attributes></element><element><id>Relation</id><coordinates><x>208</x><y>1612</y><w>585</w><h>52</h></coordinates><panel_attributes>lt=&lt;.
+ok
+fg=gray</panel_attributes><additional_attributes>10;20;430;20</additional_attributes></element><element><id>Relation</id><coordinates><x>208</x><y>312</y><w>39</w><h>1391</h></coordinates><panel_attributes>lt=.</panel_attributes><additional_attributes>10;10;10;1050</additional_attributes></element><element><id>Relation</id><coordinates><x>208</x><y>975</y><w>585</w><h>52</h></coordinates><panel_attributes>lt=&lt;&lt;&lt;-
+3.consultaInfoEventi()
+fg=gray</panel_attributes><additional_attributes>430;20;10;20</additional_attributes></element><element><id>Relation</id><coordinates><x>208</x><y>1014</y><w>585</w><h>52</h></coordinates><panel_attributes>lt=&lt;.
+eventi
+fg=gray</panel_attributes><additional_attributes>10;20;430;20</additional_attributes></element><element><id>Relation</id><coordinates><x>208</x><y>1391</y><w>585</w><h>52</h></coordinates><panel_attributes>lt=&lt;.
+ok
+fg=gray</panel_attributes><additional_attributes>10;20;430;20</additional_attributes></element><element><id>Relation</id><coordinates><x>208</x><y>1339</y><w>585</w><h>65</h></coordinates><panel_attributes>lt=&lt;&lt;&lt;-
+6.annotaInfoAggiuntive(richiedeCuoco, richiedeCucina, 
+piattiCaldi, buffet, fingerFood)
+fg=gray</panel_attributes><additional_attributes>430;20;10;20</additional_attributes></element><element><id>UMLDeployment</id><coordinates><x>689</x><y>221</y><w>143</w><h>65</h></coordinates><panel_attributes>System</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLFrame</id><coordinates><x>143</x><y>975</y><w>663</w><h>104</h></coordinates><panel_attributes>OPT
+fg=gray</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLFrame</id><coordinates><x>130</x><y>1092</y><w>676</w><h>221</h></coordinates><panel_attributes>OPT
+fg=gray</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLFrame</id><coordinates><x>143</x><y>1326</y><w>663</w><h>117</h></coordinates><panel_attributes>OPT
+fg=gray</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLFrame</id><coordinates><x>143</x><y>1456</y><w>663</w><h>104</h></coordinates><panel_attributes>OPT
+fg=gray</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>208</x><y>1469</y><w>585</w><h>52</h></coordinates><panel_attributes>lt=&lt;&lt;&lt;-
+7.modificaTitolo(nuovoTitolo)
+fg=gray</panel_attributes><additional_attributes>430;20;10;20</additional_attributes></element><element><id>Relation</id><coordinates><x>208</x><y>1508</y><w>585</w><h>52</h></coordinates><panel_attributes>lt=&lt;.
+ok
+fg=gray</panel_attributes><additional_attributes>10;20;430;20</additional_attributes></element><element><id>Relation</id><coordinates><x>208</x><y>468</y><w>585</w><h>52</h></coordinates><panel_attributes>lt=&lt;&lt;&lt;-
+1a.1 eliminaMenu(menu)
+fg=#9E1C8C</panel_attributes><additional_attributes>430;20;10;20</additional_attributes></element><element><id>Relation</id><coordinates><x>208</x><y>507</y><w>585</w><h>52</h></coordinates><panel_attributes>lt=&lt;.
+ok
+fg=#9E1C8C</panel_attributes><additional_attributes>10;20;430;20</additional_attributes></element><element><id>Relation</id><coordinates><x>208</x><y>585</y><w>585</w><h>52</h></coordinates><panel_attributes>lt=&lt;&lt;&lt;-
+1b.1 scegliMenuPerModifica(menu)
+fg=#9E1C8C</panel_attributes><additional_attributes>430;20;10;20</additional_attributes></element><element><id>Relation</id><coordinates><x>208</x><y>624</y><w>585</w><h>52</h></coordinates><panel_attributes>lt=&lt;.
+ok
+fg=#9E1C8C</panel_attributes><additional_attributes>10;20;430;20</additional_attributes></element><element><id>Relation</id><coordinates><x>208</x><y>702</y><w>585</w><h>52</h></coordinates><panel_attributes>lt=&lt;&lt;&lt;-
+1c.1 scegliMenuPerCopia(menu)
+fg=#9E1C8C</panel_attributes><additional_attributes>430;20;10;20</additional_attributes></element><element><id>UMLSpecialState</id><coordinates><x>754</x><y>520</y><w>26</w><h>26</h></coordinates><panel_attributes>type=termination
+fg=#9E1C8C
+layer=1
+lw=2</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>208</x><y>741</y><w>585</w><h>52</h></coordinates><panel_attributes>lt=&lt;.
+ok
+fg=#9E1C8C</panel_attributes><additional_attributes>10;20;430;20</additional_attributes></element><element><id>UMLClass</id><coordinates><x>221</x><y>0</y><w>572</w><h>78</h></coordinates><panel_attributes>valign=center
+halign=center
+Diagrammi di sequenza di sistema
+per l'UC Gestire Menu
+lw=0
+fontsize=24
+bg=#F9FF47</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>221</x><y>78</y><w>572</w><h>78</h></coordinates><panel_attributes>valign=center
+halign=center
+Estensioni al passo 1 (1a, 1b, 1c)
+lw=0
+fontsize=18</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLFrame</id><coordinates><x>104</x><y>338</y><w>715</w><h>468</h></coordinates><panel_attributes>ALT
+fg=#761C8C
+bg=#E7BFFF
+layer=-1
+lw=2
+--
+
+
+
+
+-.
+
+
+
+
+
+-.
+
+
+
+
+
+
+-.</panel_attributes><additional_attributes></additional_attributes></element></diagram>

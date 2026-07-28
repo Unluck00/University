@@ -1,0 +1,6 @@
+catering/target/*
+catering/database/*.db
+catering/.idea/*
+catering/.idea/catering.iml
+catering/.idea/misc.xml
+catering/.idea/modules.xml

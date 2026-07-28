@@ -1,0 +1,19 @@
+Possibili modifiche dei contratti:
+
+- In alcuni passi si ha che nella precondizione viene specificato un parametro che è un'istanza di una classe concettuale già registrata nel sistema, si può fare? si può mettere sia come parametro che come istanza?
+Es. chef è una istanza di Chef registrata a sistema
+oppure esiste un'istanza c di Chef tale che c = chef(sottolineato)
+
+- Per non confondersi con le date ricorrenti e di come NON sono istanziate ma create per lista, direi di aggiungerlo alla Scheda Evento e mettere in generale un attributo detto "dateRicorrenti = date"
+COME NON DETTO, questo è considerato un'operazione su istanze multiple
+
+DA TENERE CONTO:
+per i parametri che noi possiamo pensiamo nel in cui sia l'organizzatore che li dà al sistema, altrimenti se noi indichiamo un concetto o associazione che non vengono passati dall'organizzatore allora si può decidere di creargli un istanza nelle pre-condizioni ed eventualmente associarli al parametro passato
+es. si passa Servizio come parametro e nelle pre condizioni faccio "esiste un'istanza di Menu m tale m è in uso in servizio(sottolineato) tale che *associazione*"
+
+METTERE NELLE PRECONDIZIONI LA/LE CONDIZIONI TALI PER CUI SE NON SONO VALORIZZATE IN MODO POSITIVO ALLORA NON ACCEDONO ALL’OPERAZIONE DEL CONTRATTO, ALTRIMENTI SI DOVREBBE INSERIRE NELLE POSTCONDIZIONI QUELLO IN NEGATIVO, MA SE NON MODIFICANO IL PROGRAMMA ALLORA L’OPERAZIONE DIVENTA OBSOLETA
+Inoltre si deve specificare se il compito è stato completato o meno (maggiore sono i dettagli meglio è)
+
+CAMBIAMENTI DA FARE NEL'UC-DETTAGLIATO PER SEMPLIFICARE IL PROCEDIMENTO:
+nell'estensione 1a.a si ha che "Prosegue al passo 2 oppure prosegue al passo 9", ma secondo me deve comunque riprendere quei passi successivi e approvare l'evento, quindi cancellerei questa parte
+suddividere il passo 8d in due passi dove uno modifica le date dell'evento e l'altro i servizi dell'evento

@@ -1,0 +1,10 @@
+Possibili domande da fare al prof
+- Luogo dell'evento da aggiungere alla scheda evento oppure farsi rifornire dal cliente
+- Rimozione del personale in eccesso come estensione (del passo 8) oppure opzionale nello scenario principale di successo
+- Il nostro primo passo viene gestito dal sistema o dall'organizzatore? (più personale)
+- Possibilità di rivedere un preciso passo come estensione e farlo da riferimento
+
+Domande 24/04 da fare al prof
+- Estensioni da più passi vanno bene come li abbiamo fatti? Da 4-12 esempio
+- Estensione del passo 4 per modifica dello chef lo si elimina e poi si ripete il passo 4 per assegnarne un altro oppure direttamente aggiungere un estensione che lo modifica?
+- Passo 11a estensione o eccezione?
