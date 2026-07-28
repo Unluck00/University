@@ -1,0 +1,53 @@
+Cifrari storici:
+Orientati ai caratteri e orientato ai bit ma le caratteristiche sono le stesse (sostituzione o permutazione)
+
+Cifrarura in caratteri:
+SLIDE 17: Il cifrario di cesare è orientato ai caratteri che usa la sostituzione per traslare le lettere (orientato ai caratteri) dell'alfabeto di N posizioni (N sarebbe la chiave)
+
+SLIDE 18: È molto debole all'attacco "brute force" in cui si provano tutte le chiavi possibili fino a quando non si trova quella giusta (26 possibili (alfabeto inglese A-Z)), si basa su uno spazio di chiavi K che è troppo piccolo 
+
+SLIDE 19: Cifrari ad una lettera (monoalfabetico) in cui ogni lettera è sostituita sempre da un'altra lettera (non viene mai sostituitamente ripetuta per le altre lettere); assomiglia al cifrario di cesare ma è gestito molto meglio all'attacco "brute force", perché si ha 26! combinazioni possibili (dove 26 è il numero di lettere dell'alfabeto inglese)
+SLIDE 24-28: Però si ha una differenza di frequenza delle statistiche di una lettera che compare in una parola e grazie a quello dirà un'analisi crittografia 
+L'attacco diventa Chiper Text Only (solo testo cifrato) in cui l'avversario conosce il testo cifrato da decodificare e l'algoritmo di crittografia 
+Sono facili da attaccare per via dei attacchi statistici
+
+SLIDE 30: Cifrari ad N lettere (Cifrari N-lettere monoalfabetici) come prima ma si prende N lettere da sostituire con altre N lettere 
+Si ha quindi (26*26)! possibili soluzioni
+Ma si avrebbe sempre il problema dell'analisi statistica 
+
+SLIDE 36: Cifrari polialfabetici in cui si usano molte sostituzioni, quindi la sostituzione cambia
+L'analisi statistica è meno efficace in questo caso 
+
+SLIDE 37: Esempio il cifrario di Vigenere, che usa N chiavi di cesare che vengono usate in modo ciclico per sostituire la parola con un altra usando la posizione indice della chiave associata (vedi esempio nella slide 38)
+SLIDE 39: Il "brute force" è molto più difficile in questo caso perché si avrebbe N^26! permutazioni possibil
+Ma se l'avversario conosce la chiave N allora può studiare l'analisi statistica del testo.
+Si prende il testo è da quanto vale N si prende tutte le lettere a distanza di N e creando una stringa si applica l'analisi statistica per trovare le possibili lettere nelle posizioni 
+
+SLIDE 41: 
+Adesso si parla di cifratura in bit:
+Sostituzione dei caratteri a bit usando lo XOR che trasforma qualsiasi bit X in un altro bit Y usando un'opportuna chiave K
+Quindi si prende un carattere ASCII e si trasforma in una sequenza di 8 bit di X in un'altra sequenza da 8 bit di Y usando la chiave da 8 bit K
+Uso delle proprietà dello XOR (additivo) e AND (moltiplicativo)
+SLIDE 42: Esempio il cifrario di Vernam che è lo stesso del cifrario di Vigenere ma orientato ai bit, in cui si hanno N chiavi che si ripetono in modo ciclico per trovare il testo cifrato con lo XOR
+SLIDE 44: Per decifrare si usa la proprietà dello XOR: invertibilità (si può dimostrare logicamente (slide 44) oppure attraverso la tabella (in cui si crea una tabella a 2^3 - 1 bit e per ognuno delle possibilità si verifica l'invertibilità con lo XOR))
+SLIDE 46: Ha le stesse vulnerabilità del cifrario di Vigenere, perché sono simili; quindi la distanza di N posizioni con le N chiavi 
+
+SLIDE 47: Il cifrario one-time PAD, e come il cifrario di Vernam (una sua versione), ma la chiave è lunga quanto il testo è si usa una sola volta (usa e getta)
+Considerato totalmente sicuro, ma non sa quale sia la chiave giusta perché non si sa quale testo sia considerato (possono essere differenti)
+(In N bit ci saranno i primi N bit di diverse parole che possono essere della Divina commedia, promessi sposi, ecc...) 
+Ma la chiave dovrebbe essere lunga N bit il che è troppo lunga per una chiave che dovrebbe essere corta
+
+SLIDE 48: Ora si parla di permutazione (invece che di sostituzione) spostamento dell'informazione in diverse posizioni del testo, si dice cifrario di permutazione, suddividendo il testo in colonne a grandezza N e conoscendo l'ordine di come dovrebbe essere letto
+
+SLIDE 51: 
+Si passa ai Cifrari moderni: 
+Implementazione algoritmica, combinazione di permutazione (diffusione) e sostituzione (confusione) e conseguimento di round 
+Cifrari di AES e DES
+L'avvento del calcolatore ha dato la possibilità di definire nuovi metodi di cifratura 
+
+Parole importanti: 
+RAS
+Terminologie usate nei libri:
+Alice è l'utente A
+Bob è l'utente B 
+Eve è cattiva è attacca
