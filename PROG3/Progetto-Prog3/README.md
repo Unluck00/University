@@ -1,0 +1,263 @@
+# Progetto di laboratorio di Programmazione III
+
+MAIL CLIENT / MAIL SERVER
+
+Il Progetto di laboratorio consiste, complessivamente di due applicazioni (progetti IntelliJ IDEA diversi) distinte:
+
+1) Un mail server che gestisce le caselle di posta elettronica degli utenti registrati sul server;
+
+2) Un mail client che ciascun utente può eseguire per leggere la propria posta elettronica, inviare email ad altri account di posta elettronica (e/o a se stesso), etc.
+
+Il mail client e il mail server sono entrambi implementati come applicazioni javaFXML basate sul pattern MVC. Ciascuno di essi è implementato in un progetto javaFX distinto e organizzato in package per modularità.
+All'interno di queste applicazioni non deve esserci comunicazione diretta tra viste e model: ogni comunicazione tra questi due livelli deve essere mediata dal controller o supportata dal pattern Observer Observable.
+Non si usino le classi deprecate Observer.java e Observable.java. Si usino le classi di JavaFX che supportano il pattern Observer Observable (properties, ObservableLists, etc).
+Le applicazioni client e server devono essere eseguite in Java Virtual Machine distinte e comunicare solo ed esclusivamente attraverso la trasmissione di dati testuali in socket Java.
+Il mail client e il mail server devono parallelizzare le attività che non necessitano di esecuzione sequenziale e gestire gli eventuali problemi di accesso a risorse in mutua esclusione. Si raccomanda di prestare molta attenzione alla progettazione per facilitare il parallelismo nell’esecuzione delle istruzioni.
+Per la demo si assuma di avere 3 utenti di posta elettronica che comunicano tra loro. Si progetti però il sistema in modo da renderlo scalabile a molti utenti e a mailbox di grandi dimensioni.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+MAIL CLIENT - SPECIFICHE:
+
+Quando l'utente lancia il mail client, il client chiede di inserire l'indirizzo di posta elettronica e utilizza questo come identificatore dell'utente durante l'esecuzione.
+Il mail client mantiene i seguenti dati durante la propria esecuzione:
+indirizzo di posta elettronica dell'utente;
+casella postale dell'utente (inbox): lista dei messaggi di posta elettronica ricevuti dall'utente e non cancellati. Non gestite il cestino e neppure la outbox.
+Il mail client è ignaro di quali siano gli utenti registrati sul server. Quando l'utente inserisce un indirizzo di posta elettronica, ne verifica la correttezza sintattica (ben formatezza) utilizzando le espressioni regolari (Regex), chiedendo all'utente di reinserirlo se sintatticamente errato.
+Per verificare se un indirizzo di posta (ben formato) è esistente, il mail client si connette al server che restituisce risposta positiva o negativa.
+Si assuma che una stessa persona usi sempre lo stesso device per leggere la mail (no device multipli).
+
+
+GUI (Graphical User Interface):
+
+La GUI (view di FXML) gestisce SOLO la INBOX e permette all'utente di:
+inserire il proprio indirizzo di posta elettronica come unica forma di autenticazione (non è prevista l'iscrizione di un nuovo utente);
+visualizzare la lista dei messaggi in entrata e scorrerla per selezionare il messaggio da visualizzare in dettaglio;
+visualizzare i dettagli di uno specifico messaggio di posta elettronica;
+cancellare un messaggio di posta elettronica dalla inbox;
+creare un messaggio di posta elettronica specificando uno o più destinatari; inviare il messaggio al server tramite opportuno bottone;
+rispondere a un messaggio di posta elettronica presente nella inbox in REPLY (solo al mittente) o in REPLY-ALL (a tutti i destinatari del messaggio, incluso il mittente);
+inoltrare un messaggio (forward) a uno o più destinatari;
+per l'invio di messaggi e il forward, il client deve verificare la correttezza sintattica degli indirizzi di posta elettronica inseriti e permettere di reinserire i dati se sintatticamente errati; il controllo di esistenza dei destinatari deve invece essere effettuato dal server;
+visualizzare lo stato della connessione con il server (connesso/non connesso).
+L’interfaccia utente deve essere:
+
+parzialmente responsive:  la GUI dovrà mostrare automaticamente la lista dei messaggi aggiornata, senza che l'utente debba compiere azioni specifiche per fare il refresh. Inoltre, all'arrivo di un nuovo messaggio dovrà notificare l'utente. Non si richiede che la GUI si adatti a schermi di dimensioni differenti.
+comprensibile (trasparenza). Inoltre, a fronte di errori, deve segnalare il problema all’utente.
+funzionale (efficacia) per permettere di eseguire operazioni limitando il numero di click da fare.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+MAIL SERVER:
+Il mail server gestisce una lista di caselle di posta elettronica e ne mantiene la persistenza utilizzando file (txt o binari, JSON se sapete come gestirli, a vostra scelta - non si possono usare database) per memorizzare i messaggi in modo permanente.
+Ogni casella di posta elettronica contiene:
+
+Nome dell’account di mail associato alla casella postale (es., giorgio@mia.mail.com).
+Lista (eventualmente vuota) di messaggi. I messaggi di posta elettronica sono istanze di una classe Email che specifica ID, mittente, destinatario/i, argomento, testo e data di spedizione del messaggio.
+Il mail server ha un’interfaccia grafica sulla quale viene visualizzato il log degli eventi che occorrono durante l’interazione tra i client e il server.
+
+Per esempio: apertura/chiusura di una connessione tra mail client e server, invio di messaggi da parte di un client a uno o più destinatari, errori nella consegna di messaggi ai destinatari.
+NB: NON fare log di eventi locali al client come il fatto che l'utente ha schiacciato un bottone, aperto una finestra o simili in quanto non sono di pertinenza del server.
+NB: si assuma che il server abbia un numero fisso di account di posta elettronica, precompilato (per es. 3 account). Non si richiede che da mail client si possano registrare nuovi account di posta sul server.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+COMUNICAZIONE TRA CLIENT E SERVER:
+
+La verifica dell'esistenza degli indirizzi di posta elettronica è responsabilità del server. In caso l'utente inserisca indirizzi di posta elettronica non esistenti, il server deve inviare messaggio di errore al client. Per esempio, in merito al fallimento di un'autenticazione, oppure in caso l'utente tenti di inviare un messaggio a un account inesistente.
+
+Il mail client non deve andare in crash se il mail server viene spento. Gestire i problemi di connessione al mail server inviando opportuni messaggi di errore all’utente e fare in modo che il mail client si riconnetta automaticamente al server quando questo è novamente attivo.
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+ULTERIORI REQUISITI (MAIL CLIENT E MAIL SERVER)
+
+Non gestite socket permanenti per collegare client e server: fate in modo che, come HTTP, il client chieda di aprire la connessione ogni volta che ha bisogno di fare un'operazione. 
+Non trasferite intere caselle di posta elettronica da client a server, o viceversa, per questioni di scalabilità del servizio. Quando il client chiede aggiornamenti al server, il server deve solo inviare i messaggi che non sono stati precedentemente distribuiti al client.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+PROMEMORIA PER L'ESAME
+Il progetto SW può essere svolto in gruppo (max 3 persone) o individualmente. Se lo si svolge in gruppo la discussione deve essere fatta dall’intero gruppo in soluzione unica.
+La discussione potrà essere fatta nelle date di appello orale dell’insegnamento (appelli su Esse3 nominati "Discussione di laboratorio"). 
+Si può discutere il progetto SW prima o dopo aver sostenuto la prova scritta, a propria scelta. 
+Come da regolamento d’esame il voto finale si ottiene come media del voto della prova teorica (scritta) e della discussione di laboratorio (i due voti hanno ugual peso nella media). 
+Il voto finale deve essere registrato entro fine settembre 2025, data oltre la quale non è possibile mantenere i voti parziali. Leggere il regolamento d’esame sulla pagina web dell’insegnamento per ulteriori dettagli.
+
+
+## Luca Gado
+
+### Struttura del progetto
+
+FALSO: Si è deciso di creare un solo progetto Gradle multi-module che conterrà due moduli FXML separati (uno per il client e l'altro per il server), in questo modo si creeranno due JVM e quindi due build.gradle ben distinte 
+
+Si gestisce una compilazione automatica dei file Java usando Maven 
+
+### N.B. con Gradle
+
+- gradlew e gradlew.bat: sono file eseguibili chiamati Gradle Wrapper, sono script che permettono di eseguire il tool di automazione della build Gradle senza doverlo installare e garantendo una versione coerente per tutti gli sviluppatori. gradlew è per linux/macOS, mentre gradlew.bat è per Windows
+
+- gradle.properties: file di testo che contiene impostazioni globali; definisce variabili come la memoria massima per la compilazione o versioni comuni di librerie.
+
+- settings.gradle: file che definisce l'architettura del progetto ed è il punto di ingresso. 
+Elenca quali moduli o sotto-progetti devono essere inclusi nella build.
+Gradle legge prima settings.gradle per capire quanti e quali file build.gradle deve cercare ed eseguire
+
+- build.gradle: è un file di configurazione per Gradle, che permette l'automazione della compilazione per gestione dei progetti Java, definendo dipendenze, task e configurazione del progetto in modo efficiente usando un linguaggio DSL (Domain Specific Language)
+
+- la cartella gradle/: serve a garantire che chiunque scarichi il progetto utilizzi la stessa identica versione di Gradle. Contiene principalmente la sottocartella wrapper/ con due file fondamentali: gradle-wrapper.jar (codice eseguibile che permette al "wrapper" di funzionare e scaricare automaticamente Gradle se non è presente sul computer) e gradle-wrapper.properties (Un file di testo che specifica quale versione di Gradle scaricare (es. la 8.5) e da quale indirizzo)
+
+- la cartella .gradle/: viene generata automaticamente da Gradle durante la compilazione. Non deve essere condivisa su Git poiché contiene dati specifici del tuo PC.
+
+- la cartella build/: sono i risultati dei processi; contiene tutto ciò che Gradle genera durante la compilazione: file .class, file temporanei e l'eseguibile finale.
+Le istruzioni scritte in build.gradle dicono a Gradle cosa mettere in questa cartella. Quando esegui ./gradlew clean, la cartella build/ viene eliminata per garantire una nuova compilazione da zero. 
+
+### N.B. con Maven
+
+- si usa il comando `./mvnw javafx:run` per far eseguire il progetto da terminale
+
+- pom.xml: Si ha che Maven richiede Java 21 dalla parte del Server
+
+- si ha il modulo Shared (creato in jar) quindi bisogna prima installarlo e poi compilarlo, quindi nello Shared bisogna: 
+    - prima installarlo: `./mvnw install`
+    - successivamente compilarlo: `./mvnw compile`
+    - in caso di modifiche, bisogna re-installarlo e re-compilare, ricordandoti prima di fare `clean`
+
+### Comunicazione tra Client e Server
+
+Il client e server comunicano attraverso dei socket (non-persistenti), tramite un protocollo testuale, in cui il client invia vari comandi al server dove ognuno di questi definisce un tipo di operazione (richieste) e ottenendo dal server la risposta di tale operazione (tramite costanti di protocollo).
+
+La comunicazione avviene tramite serializzazione e deserializzazione di oggetti per la comunicazione, in particolare della classe Message che contiente vari campi: command, status, data e timestamp; in cui nel campo data contiene una stringa (che sarà il contenuto dell'Email) che verrà anch'esso serializzato/deserializzato come oggetto della classe Email.
+
+Mentre per i command si hanno:
+- LOGIN: usato all'avvio per autenticare/identificare (server risponde STATUS_OK/ERR)
+- FETCH_NEW: permette di definire una connessione non persistente col server e di controllare che sia attivo, in questo modo si richiede i messaggi che non gli sono ancora arrivati (sia se il server è online che non)
+- SEND: invio di messaggio ai destinatari (sia al receiver principale e dal CC), se il server non è attivo allora manda un warning alla GUI del client avvisandolo
+- DELETE: permette di eliminare l'email salvata nello storage del client e server
+
+Uso del file server.properties per contenere la porta per la comunicazione server.
+Per un progetto reale sarebbe meglio fare una configurazione della porta del server all'esterno per garantire flessibilità e separazione tra codice e configurazione; altrimenti se la si scrive nel codice bisognerebbe ricompilare e ridistribuire rischiando cosi errori inutili; altrimenti si scrive direttamente sul codice
+Uso della seguente fonte:
+ - https://stackoverflow.com/questions/24093257/thread-currentthread-getcontextclassloader-getresourceasstream-reads-a-prope
+
+#### Usp della libreria Jackson
+
+Uso di una libreria di mapping JSON per serializzare o deserializzare l'oggetto Message e Email, in questo caso Jackson, che permetterà di trasformare l'oggetto in JSON o viceversa
+
+Aggiungendo una dipendenza all'interno di Maven:
+    <dependency>
+        <groupId>com.fasterxml.jackson.core</groupId>
+        <artifactId>jackson-databind</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>com.fasterxml.jackson.datatype</groupId>
+        <artifactId>jackson-datatype-jsr310</artifactId>
+    </dependency>
+
+Uso della classe centrale: ObjectMapper mapper = new ObjectMapper();
+
+Uso del TypeReference permette di conservare le informazioni evitando il problema del Type Erasure, in cui Java rimuove le informazioni dei tipi generici a runtime, in cui se si deserializza JSON in un elemento della List<Email> Jackson non saprà di cosa è fatto la lista.
+Le parentesi graffe `{}` alla fine di `new TypeReference<List<User>>(){}` è un trucco che forza il compilatore a memorizzare il tipo generico nel bytecode della sottoclasse.
+
+
+#### Uso del modulo Maven chiamato Shared (produce un jar)
+Viene creato un modulo a parte che sarà una libreria che conterrà i file in comune sia nel JVM Client che nel JVM Server (contratto tra le due classi); viene prodotto un jar in modo da creare la libreria condivisa
+Tale modulo conterrà file per:
+- il `models/` classi di dominio che vengono serializzate in JSON per la comunicazione client-server. In questo caso `Email.java` e `Message.java`
+- il `protocol/` definisce struttura e regole di comunicazione tra client e server. Come `CommandOperation.java` e `ProtocolConstants.java`
+- l'`utils/` helper per operazioni comuni tra client e server. Cioè il `JsonSerializer.java`
+
+#### Classe Email 
+
+Ho evitato Serializable perché la specifica richiede la trasmissione di dati testuali via socket. Inoltre Serializable introduce un forte accoppiamento tra client e server e rende il protocollo fragile ai cambiamenti. Ho preferito un protocollo testuale (JSON) che è più scalabile, debuggabile e aderente alle richieste; inoltre JSON resta preferibile (leggibile, ispezionabile) ma Serializable è accettabile per file binari.
+
+Solo il MAIL CLIENT crea nuove istanze di Email, quando l’utente:
+ - crea un nuovo messaggio
+ - risponde (reply / reply-all)
+ - inoltra (forward)
+
+Email ha il costruttore vuoto perché serve a Jackson (JSON): Jackson crea l’oggetto vuoto poi chiama i setter
+Senza costruttore vuoto: deserializzazione fallisce
+
+Ciclo di vita completo di una Email (passo-passo):
+1) Creazione (CLIENT); con istanza della classe Email
+2) Invio al server; client serializza l'oggetto Email in JSON e lo manda via socket
+3) Ricezione sul SERVER; riceve il JSON e lo ricostruisce come oggetto (deserializzazione)
+4) Salvataggio; prende l’istanza Email e la aggiunge alla mailbox dei destinatari (vive nel file JSON e in memoria del server)
+5) Distribuzione al client destinatario; riceve JSON e ricostruisce l’oggetto Email, questa è una nuova istanza Java, ma rappresenta lo stesso messaggio (stesso id) 
+6) Visualizzazione; inserisce l’Email nella inbox e a ListView la mostra automaticamente
+
+Server aperto in backend nel metodo main() della classe ServerMain 
+
+### Thread e Thread Pool
+
+Si ha un solo thread che rimane in attessa di connessioni (accpet()) e li delega al pool di thread
+Si è aggiunto un pool di thread per gestire in maniera sincronizzata e parallela i task invitati per gestire la connessione fra il server e il client che l'ha richiesto
+L'ha decisione ricade tra l'executors newFixedThreadPool (che è gia preconfigurato) oppure ThreadPoolExecutor (che è configurabile, più adatto per un controllo su una architettura reale come con un server o un socket); per questo si è deciso di optare per un controllo completo (in modo da non creare una coda infinita ma piuttosto una controllata)
+Altrimenti si potrebbe usare newCachedThreadPool() per creare un thread per ogni connessione, ma potrebbe essere inefficiente se ci sono molte connessioni
+
+Nella classe ServerSocketManager si gestisce i socket del lato server, in cui:
+1) Nel costruttore a parte l'inizializzazione degli attributi passati come parametri, si setta il Thread del ServerSocketManager come daemon per assicurare che il servizio non blocchi lo spegnimento (shutdown) della JVM, favorendo avvio/terminazione controllati; se l’unico thread rimasto è questo, la JVM può terminare.
+2) Poi prima si esegue il metodo start(), chiamata dal thread della GUI con server.start(), per aggiungere la logica di inizializzazione del server come la creazione di un server socket sulla porta specializzata e un thread di Pool usando ThreadPoolExecutor
+3) Successivamente si chiama il metodo run(), tramite il metodo super.start() chiamato in start(), per la logica di accettazzione delle connessioni a lato client, in cui si avvia il thread (daemon) del ServerSocketManager in parallelo al thread principale (GUI)
+4) Nel metodo run() c'è un loop di accettazzione dei socket (accept()) e per ogni nuova connessione accettata il server sottomette un task (fornendo un'istanza dell'oggetto ClientHandler, che implementa Runnable) al pool, in cui questo pool provvede a creare/riutilizzare un thread worker per eseguire quel Runnable.
+Inoltre nel ciclo principale c'è un timeout per poter controllare periodicamente Thread.interrupted() e sapere quando uscire
+5) Infine quando il thread è stato interrotto (chiuso la GUI), allora si chiude il server socket e il thread pool
+
+N.B. 
+    il metodo start() che “avvia” il server non è mai invocato direttamente all’interno dello stesso ServerSocketManager; è sempre un altro thread (GUI o main) che lo richiama, mentre super.start() è quello che innesca la creazione del thread esecutore. Per il resto la logica di accettazione/dispatch all’interno di run() e il ruolo del pool sono esattamente come li hai spiegati.
+
+Uso del comando `Platform.runLater(Runnable runnable)` di JavaFX è un metodo utilizzato per eseguire un'operazione sul thread dell'applicazione JavaFX (UI thread) da un thread in background, viene usato:
+- nella classe `HelloController` aggiorna la finestra del server per aggiornare il log
+- nella classe `InboxController` usato nello startPolling per aggiornare la finestra del utente per controllo di nuove email e/o se il server è attivo
+
+#### Sincronizzazione dei threads sul server
+- nella classe `InboxController` 
+    - uso del Lock `ReentrantLock`, in modo da evitare il race condition di quando si vuole aggiornare la lista delle email nel file JSON locale del client
+
+- nella classe `ServerStorage`
+    - Uso del lock `ReentrantReadWriteLock` per la gestione concorrente degli utenti registrati in `users.json`, in particolare:
+        - readLock consente accessi concorrenti in lettura (operazione più frequente, es. verifica esistenza utente)
+        - writeLock garantisce accesso esclusivo in scrittura (es. creazione nuovo utente)
+    - Dati degli utenti gestiti dalla struttura dati `Map<String, User>` (implementata con `HashMap`), dove:
+        -  la chiave unica è l'email
+        - il valore associato sono le informazioni su quell'utente
+    Questa scelta permette accesso diretto in tempo O(1), ideale per operazioni frequenti come lettura e validazione
+
+    - Sincronizzazione delle mailbox per ogni utente tramite un sistema di lock per ognuno di loro:
+        - viene utilizzata una `Map<String, Object>` chiamata `mailboxLocks`, implementata con `ConcurrentHashMap`
+        - ogni email è associata a un oggetto lock dedicato, ottenuto tramite computeIfAbsent, che garantisce creazione atomica e thread-safe del lock
+        - le operazioni sulle inbox (lettura, scrittura, cancellazione) sono racchiuse in blocchi synchronized lato client su questi lock
+    
+    - Questo approccio consente:
+        - isolamento delle mailbox: ogni utente ha un proprio lock indipendente
+        - assenza di race condition nelle operazioni sui file JSON delle inbox
+        - maggiore parallelismo: thread diversi possono operare su mailbox diverse senza bloccarsi a vicenda
+
+### Pattern MVC sia lato Client che lato Server
+
+Lato Client:
+- model: la classe `EmailClient` utilizza le properties di JavaFX (`SimpleStringProperty`); 
+sono valori osservabili e modificabili. 
+Questo soddisfa il pattern Observer–Observable: le proprietà implementano ObservableValue e notificano automaticamente i cambiamenti (reagisce automaticamente alle modifiche della lista (GUI reattiva)).
+La `ObservableList<EmailClient>` contiene gli oggetti del model, cioè una lista di oggetti osservabili.
+La `TableView`(componente della GUI) è collegata sia alla `ObservableList` (tramite `setItems(emailList)`) sia alle properties (tramite `TableColumn`  usano `setCellValueFactory(...)`)
+I `ChangeListener` (es. `selectedItemProperty().addListener`) permettono di reagire a eventi della GUI come la selezione della property `selectedItemProperty()`, quindi del `ObservableValue`.
+- view: `inbox-view.fxml` e `login-view.fxml` che mostrano inbox, dettagli messaggio, bottoni ecc..; non contiene logica applicativa
+- controller: `InboxController` e `LoginController` entrambi reagiscono agli eventi della GUI e permettono di parlare con il server ed eventualmente aggiornare il model
+
+Lato Server:
+- model: `ServerStorage` contiene una struttura dati `Map<String, Object>` (per accesso diretto) che permette di gestire gli utenti, email, concorrenza e persistenza dei file json
+La concorrenza sui file json viene gestita con l'implementazione del Lock `ReentrantReadWriteLock` 
+- view: `hello-view.fxml` mostra la grafica applicata al log degli eventi del server
+- controller: `ClientHandler` e `HelloController` entrambi coordinano la GUI del server e `ClientHandler` permette di aggiornare e gestire le operazioni con il model
+
+
+#### Polling in Background: 
+Implementato un Thread dedicato (`Daemon`) che ogni 5 secondi richiede al `MailService` le nuove email.
+**Sicurezza Thread-UI:** Tutti gli aggiornamenti visivi (nuovi messaggi in lista, notifiche, cambio stato connessione) derivanti dal thread di polling vengono passati al JavaFX Application Thread tramite `Platform.runLater()`, evitando il crash dell'interfaccia.
+**Invio Asincrono:** L'azione di invio mail è gestita tramite un `Task` di JavaFX in background. Durante l'operazione l'interfaccia mostra un `ProgressIndicator` (spinner) e inibisce i click multipli.
+Gestione visiva della disconnessione (pallino rosso) e della notifica di nuovi messaggi (banner chiudibile).
